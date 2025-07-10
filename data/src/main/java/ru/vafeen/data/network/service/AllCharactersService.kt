@@ -20,6 +20,5 @@ interface AllCharactersService {
 
     companion object {
         private const val GET_ALL_CHARACTERS = "character"
-        const val BASE_URL = "https://rickandmortyapi.com/api/"
     }
 }

@@ -17,9 +17,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.vafeen.domain.model.CharacterData
-import ru.vafeen.domain.model.PaginationInfo
 import ru.vafeen.domain.network.ResponseResult
 import ru.vafeen.domain.network.repository.AllCharactersRepository
+import ru.vafeen.domain.network.repository.SingleCharacterRepository
 import ru.vafeen.presentation.ui.theme.RickAndMortyCharactersTheme
 import javax.inject.Inject
 
@@ -27,17 +27,20 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var allCharactersRepository: AllCharactersRepository
+
+    @Inject
+    lateinit var singleCharacterRepository: SingleCharacterRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launch(Dispatchers.IO) {
-            val result: ResponseResult<Pair<PaginationInfo, List<CharacterData>>> =
-                allCharactersRepository.getAllCharacters()
+            val result = singleCharacterRepository.getCharacter(1)
             when (result) {
                 is ResponseResult.Error -> {
                     Log.e("result", result.stacktrace)
                 }
 
-                is ResponseResult.Success<Pair<PaginationInfo, List<CharacterData>>> -> {
+                is ResponseResult.Success<CharacterData> -> {
                     Log.d("result", "${result.data}")
                 }
             }

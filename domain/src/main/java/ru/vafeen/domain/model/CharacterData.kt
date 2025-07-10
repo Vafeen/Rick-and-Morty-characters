@@ -30,28 +30,4 @@ data class CharacterData(
     val episodeIds: List<Int>,
     val apiUrl: String,
     val createdAt: ZonedDateTime
-) {
-    /**
-     * Location information container
-     * @property name Common location name
-     * @property locationId Unique location identifier (nullable)
-     */
-    data class Location(
-        val name: String,
-        val locationId: Int?
-    )
-
-    /**
-     * Character life status enumeration
-     */
-    enum class LifeStatus {
-        ALIVE, DEAD, UNKNOWN
-    }
-
-    /**
-     * Gender identity enumeration
-     */
-    enum class Gender {
-        MALE, FEMALE, GENDERLESS, UNKNOWN
-    }
-}
+)

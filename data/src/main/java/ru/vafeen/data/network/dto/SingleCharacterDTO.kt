@@ -3,21 +3,21 @@ package ru.vafeen.data.network.dto
 import com.google.gson.annotations.SerializedName
 
 /**
- * Character data transfer object (DTO) representing API response structure
+ * Data Transfer Object for single character response
  * @property id Unique identifier for the character
  * @property name Full name of the character
- * @property status Current life status (Alive/Dead/unknown)
+ * @property status Current life status ('Alive', 'Dead' or 'unknown')
  * @property species Biological species classification
- * @property type Subspecies or variant information (empty string if none)
- * @property gender Gender identity (Male/Female/Genderless/unknown)
- * @property origin Character's original location
+ * @property type Subspecies or variant information (empty if none)
+ * @property gender Gender identity ('Female', 'Male', 'Genderless' or 'unknown')
+ * @property origin Character's place of origin
  * @property location Character's last known location
  * @property image URL to character's avatar image (300x300px)
  * @property episode List of episode URLs where character appears
  * @property url Direct URL to this character's API endpoint
  * @property created ISO-8601 formatted creation timestamp
  */
-data class CharacterDataDTO(
+data class SingleCharacterDTO(
     @SerializedName("id") val id: Int,
     @SerializedName("name") val name: String,
     @SerializedName("status") val status: LifeStatusDTO,
