@@ -17,12 +17,19 @@ import java.time.ZonedDateTime
  * @receiver CharacterResponse API response object
  * @return Pair containing pagination info and list of domain character models
  */
-fun CharacterResponse.toDomain(): Pair<PaginationInfo, List<CharacterData>> = PaginationInfo(
-    totalCount = info.totalCount,
-    totalPages = info.totalPages,
-    nextPage = info.nextPageUrl?.extractPageNumber(),
-    prevPage = info.prevPageUrl?.extractPageNumber()
-) to results.map { it.toDomain() }
+fun CharacterResponse.toDomain(): Pair<PaginationInfo, List<CharacterData>> {
+    val pagination = PaginationInfo(
+        totalCount = info.totalCount,
+        totalPages = info.totalPages,
+        nextPage = info.nextPageUrl?.extractPageNumber(),
+        prevPage = info.prevPageUrl?.extractPageNumber()
+    )
+
+    // Обработка случая, когда results = null (хотя API Rick and Morty всегда возвращает массив)
+    val characters = results?.map { it.toDomain() } ?: emptyList()
+
+    return pagination to characters
+}
 
 /**
  * Converts single Character DTO to domain model

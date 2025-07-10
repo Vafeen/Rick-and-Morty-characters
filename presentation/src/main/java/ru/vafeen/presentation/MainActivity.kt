@@ -17,8 +17,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.vafeen.domain.model.CharacterData
+import ru.vafeen.domain.model.PaginationInfo
 import ru.vafeen.domain.network.ResponseResult
 import ru.vafeen.domain.network.repository.AllCharactersRepository
+import ru.vafeen.domain.network.repository.FilterCharactersRepository
 import ru.vafeen.domain.network.repository.SingleCharacterRepository
 import ru.vafeen.presentation.ui.theme.RickAndMortyCharactersTheme
 import javax.inject.Inject
@@ -31,16 +33,21 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var singleCharacterRepository: SingleCharacterRepository
 
+    @Inject
+    lateinit var filterCharactersRepository: FilterCharactersRepository
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launch(Dispatchers.IO) {
-            val result = singleCharacterRepository.getCharacter(1)
+            val result: ResponseResult<Pair<PaginationInfo, List<CharacterData>>> =
+                filterCharactersRepository.filterCharacters(
+                    name = "nonexistentcharacter123"
+                )
             when (result) {
                 is ResponseResult.Error -> {
                     Log.e("result", result.stacktrace)
                 }
 
-                is ResponseResult.Success<CharacterData> -> {
+                is ResponseResult.Success<Pair<PaginationInfo, List<CharacterData>>> -> {
                     Log.d("result", "${result.data}")
                 }
             }

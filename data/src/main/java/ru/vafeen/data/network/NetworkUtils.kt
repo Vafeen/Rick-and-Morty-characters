@@ -1,6 +1,5 @@
 package ru.vafeen.data.network
 
-import android.util.Log
 import ru.vafeen.domain.network.ResponseResult
 
 /**
@@ -22,12 +21,12 @@ internal suspend fun <T> getResponseResultWrappedAllErrors(response: suspend () 
     try {
         ResponseResult.Success(data = response())
     } catch (e: Exception) {
-        Log.e(
-            "NetworkError",
-            "Request failed: ${e.javaClass.simpleName}\n" +
-                    "Message: ${e.localizedMessage}\n" +
-                    "Stacktrace: ${e.stackTraceToString()}"
-        )
+//        Log.e(
+//            "NetworkError",
+//            "Request failed: ${e.javaClass.simpleName}\n" +
+//                    "Message: ${e.localizedMessage}\n" +
+//                    "Stacktrace: ${e.stackTraceToString()}"
+//        )
         ResponseResult.Error(
             stacktrace = "${e.javaClass.simpleName}: ${e.localizedMessage}"
         )

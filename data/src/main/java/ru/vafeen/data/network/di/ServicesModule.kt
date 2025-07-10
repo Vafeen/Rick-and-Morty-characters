@@ -6,8 +6,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import ru.vafeen.data.network.service.APIInfo
+import ru.vafeen.data.network.APIInfo
 import ru.vafeen.data.network.service.AllCharactersService
+import ru.vafeen.data.network.service.FilterCharactersService
 import ru.vafeen.data.network.service.SingleCharacterService
 import javax.inject.Singleton
 
@@ -28,5 +29,9 @@ internal class ServicesModule {
     fun provideSingleCharacterService(): SingleCharacterService =
         retrofit.create(SingleCharacterService::class.java)
 
+    @Provides
+    @Singleton
+    fun provideFilterCharactersService(): FilterCharactersService =
+        retrofit.create(FilterCharactersService::class.java)
 
 }
