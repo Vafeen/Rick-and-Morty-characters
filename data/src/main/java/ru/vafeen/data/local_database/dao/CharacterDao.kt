@@ -9,36 +9,46 @@ import ru.vafeen.data.local_database.dao.base.FlowGetAllImplementation
 import ru.vafeen.data.local_database.entity.CharacterEntity
 
 /**
- * Data Access Object (DAO) for character entities in the local database.
- * Provides methods for CRUD operations and data retrieval with pagination support.
+ * Data Access Object (DAO) for [CharacterEntity] operations in the local Room database.
+ * Provides reactive and paginated access to character data with automatic change notifications.
  *
- * Extends:
- * - [DataAccessObject] for basic CRUD operations
- * - [FlowGetAllImplementation] for Flow-based data streaming
+ * Combines:
+ * - Standard CRUD via [DataAccessObject]
+ * - Reactive streams via [FlowGetAllImplementation]
+ * - Custom pagination methods
  */
 @Dao
 internal interface CharacterDao : DataAccessObject<CharacterEntity>,
     FlowGetAllImplementation<CharacterEntity> {
 
     /**
-     * Retrieves a paginated list of characters from the local database.
+     * Retrieves a paginated subset of characters using offset/limit strategy.
      *
-     * @param offset The starting position of the pagination (0-based index)
-     * @param limit The maximum number of items to return
-     * @return List of [CharacterEntity] objects for the requested page
+     * @param offset The starting position in the dataset (0-based index)
+     * @param limit Maximum number of items to return
+     * @return List of [CharacterEntity] for the requested page.
+     *         Empty list if no data exists at the specified offset.
      *
+     * @sample ru.vafeen.data.repository.CharacterRepositoryImpl.getPagedCharacters
      */
     @Query("SELECT * FROM characters LIMIT :limit OFFSET :offset")
     suspend fun getPagedCharacters(offset: Int, limit: Int): List<CharacterEntity>
 
+    /**
+     * Creates a [PagingSource] for integration with Jetpack Paging 3 library.
+     *
+     * @return Configured [PagingSource] that loads [CharacterEntity] items
+     *         with integer keys representing page indices.
+     */
     @Query("SELECT * FROM characters")
     fun getPagingSource(): PagingSource<Int, CharacterEntity>
 
     /**
-     * Retrieves all characters from the local database as a continuous stream.
-     * The Flow emits a new list whenever the underlying data changes.
+     * Provides reactive stream of all characters with automatic updates.
      *
-     * @return [Flow] emitting the complete list of [CharacterEntity] objects
+     * @return [Flow] emitting the complete dataset that automatically
+     *         updates on any changes to the 'characters' table.
+     *         Emits empty list if table is empty.
      *
      * @see FlowGetAllImplementation.getAll
      */
@@ -46,11 +56,20 @@ internal interface CharacterDao : DataAccessObject<CharacterEntity>,
     override fun getAll(): Flow<List<CharacterEntity>>
 
     /**
-     * Clears all character entries from the local database.
-     * This operation is irreversible and should be used with caution.
+     * Deletes all records from the characters table.
+     * This operation resets all auto-increment counters.
      *
      * @see DataAccessObject.clear
      */
     @Query("DELETE FROM characters")
     override suspend fun clear()
+
+    /**
+     * Counts total character records in the database.
+     *
+     * @return Total number of [CharacterEntity] records.
+     *         Returns 0 if table is empty.
+     */
+    @Query("SELECT COUNT(*) FROM characters")
+    suspend fun getCharactersCount(): Int
 }

@@ -1,8 +1,5 @@
 package ru.vafeen.presentation.ui.screen.main_screen
 
-import android.util.Log
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,10 +16,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
@@ -34,64 +29,59 @@ internal fun CharactersScreen(
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val characters = viewModel.charactersFlow.collectAsLazyPagingItems()
-    LaunchedEffect(characters) {
-        Log.d("paging", "${characters.itemSnapshotList.items}")
-    }
     Box(modifier = Modifier.fillMaxSize()) {
-        if (characters.loadState.refresh is LoadState.Loading) {
-            CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.Center)
-            )
-        } else if (characters.loadState.refresh is LoadState.Error) {
-            val error = characters.loadState.refresh as LoadState.Error
-            ErrorItem(
-                message = error.error.localizedMessage ?: "Unknown error",
-                modifier = Modifier.align(Alignment.Center),
-                onClickRetry = { characters.retry() }
-            )
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
+        when (characters.loadState.refresh) {
+            is LoadState.Loading -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
 
-                items(count = characters.itemCount) {
-                    val entity =
-                        characters[it]
-                    if (entity != null) {
-                        Column(
-                            modifier = Modifier
-                                .padding(5.dp)
-                                .border(BorderStroke(1.dp, Color.Black))
-                                .padding(5.dp)
-                                .clickable {
-                                    viewModel.insert(entity.copy(name = "${entity.name}123"))
-                                }) {
-                            Text("id=${entity.id}")
-                            Text(entity.name)
+            is LoadState.Error -> {
+                val error = characters.loadState.refresh as LoadState.Error
+                ErrorItem(
+                    message = error.error.localizedMessage ?: "Unknown error",
+                    modifier = Modifier.align(Alignment.Center),
+                    onClickRetry = { characters.retry() }
+                )
+            }
+
+            else -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+
+                    items(count = characters.itemCount) {
+                        val entity =
+                            characters[it]
+                        if (entity != null) {
+                            CharacterItem(entity) {
+                                viewModel.insert(entity.copy(name = "${entity.name}123"))
+                            }
+                        } else {
+                            LoadingItem(entity)
                         }
-                    } else {
-                        LoadingItem(entity)
                     }
-                }
 
-                // Обработка ошибок при подгрузке
-                if (characters.loadState.append is LoadState.Error) {
-                    val error = characters.loadState.append as LoadState.Error
-                    item {
-                        ErrorItem(
-                            message = error.error.localizedMessage ?: "Load more error",
-                            modifier = Modifier.fillMaxWidth(),
-                            onClickRetry = { characters.retry() }
-                        )
+                    // Обработка ошибок при подгрузке
+                    if (characters.loadState.append is LoadState.Error) {
+                        val error = characters.loadState.append as LoadState.Error
+                        item {
+                            ErrorItem(
+                                message = error.error.localizedMessage ?: "Load more error",
+                                modifier = Modifier.fillMaxWidth(),
+                                onClickRetry = { characters.retry() }
+                            )
+                        }
                     }
-                }
-                // Добавляем индикатор загрузки при подгрузке
-                if (characters.loadState.append is LoadState.Loading) {
-                    item {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .size(30.dp)
-                        )
+                    // Добавляем индикатор загрузки при подгрузке
+                    if (characters.loadState.append is LoadState.Loading) {
+                        item {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .size(30.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -100,9 +90,13 @@ internal fun CharactersScreen(
 }
 
 @Composable
-fun CharacterItem(character: CharacterData) {
+fun CharacterItem(character: CharacterData, onClick: () -> Unit) {
     // Реализация отображения одного персонажа
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .clickable(onClick = onClick)
+    ) {
 //        AsyncImage(
 //            model = ImageRequest.Builder(LocalContext.current)
 //                .data(character.imageUrl)

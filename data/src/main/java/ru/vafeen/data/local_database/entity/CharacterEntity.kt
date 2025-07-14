@@ -7,27 +7,22 @@ import ru.vafeen.domain.model.Gender
 import ru.vafeen.domain.model.LifeStatus
 
 /**
- * Room Entity class representing a character in the local database.
- * Stores all character properties with type conversions:
- * - Enums are stored as Strings
- * - Lists are serialized to JSON strings
- * - Timestamps are stored in ISO format
- *
- * @property id Unique character identifier
- * @property name Character name
- * @property lifeStatus Character life status (converted from enum to String)
- * @property species Character species classification
- * @property subtype Character subtype or subspecies (nullable)
- * @property gender Character gender (converted from enum to String)
- * @property originName Origin location name
- * @property originId Origin location ID (nullable)
- * @property currentLocationName Current location name
- * @property currentLocationId Current location ID (nullable)
- * @property imageUrl URL of character's image
- * @property episodeIds List of episode IDs (stored as JSON string)
- * @property apiUrl API endpoint URL for this character
- * @property createdAt Creation timestamp in ISO format
- * @property nextKey Key for paging
+ * Room entity representing a character in local database
+ * @property id The id of the character
+ * @property name The name of the character
+ * @property lifeStatus The status of the character ('Alive', 'Dead' or 'unknown')
+ * @property species The species of the character
+ * @property subtype The type or subspecies of the character
+ * @property gender The gender of the character ('Female', 'Male', 'Genderless' or 'unknown')
+ * @property originName Name of the character's origin location
+ * @property originId The id of the origin location
+ * @property currentLocationName Name of the character's last known location
+ * @property currentLocationId The id of the last known location
+ * @property imageUrl Link to the character's image (300x300px)
+ * @property episodeIds List of episodes in which this character appeared (as JSON string)
+ * @property apiUrl Link to the character's own URL endpoint
+ * @property createdAt Time at which the character was created in the database
+ * @property nextKey Key for pagination support
  */
 @Entity(tableName = "characters")
 data class CharacterEntity(

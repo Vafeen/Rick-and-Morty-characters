@@ -5,17 +5,14 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import ru.vafeen.data.caching.CharacterPagingSource
 import ru.vafeen.data.caching.CharactersRemoteMediator
 import ru.vafeen.data.local_database.converter.toCharacterData
 import ru.vafeen.data.local_database.converter.toEntity
 import ru.vafeen.data.local_database.dao.CharacterDao
 import ru.vafeen.domain.local_database.repository.CharacterLocalRepository
 import ru.vafeen.domain.model.CharacterData
-import ru.vafeen.domain.network.repository.AllCharactersRepository
 import javax.inject.Inject
 
 /**
@@ -31,7 +28,7 @@ import javax.inject.Inject
  */
 internal class RoomCharacterLocalRepository @Inject constructor(
     private val characterDao: CharacterDao,
-    private val remoteRepository: AllCharactersRepository
+    private val remoteMediatorFactory: CharactersRemoteMediator.Factory
 ) : CharacterLocalRepository {
 
 
@@ -61,26 +58,11 @@ internal class RoomCharacterLocalRepository @Inject constructor(
         initialKey = 1,
         config = PagingConfig(
             pageSize = PAGE_SIZE,
-            // здесь нужно учитывать, что если я включаю плейсхолдеры, то список должен уметь
-            // работать с этим, и если приходит null, то рисовать заглушку
             enablePlaceholders = true,
-//            initialLoadSize = PAGE_SIZE * INITIAL_LOAD_FACTOR
         ),
-        pagingSourceFactory = {
-            val pagingSource = CharacterPagingSource(pageSize = PAGE_SIZE) { config ->
-                delay(2000)
-                getPagedCharacters(offset = config.offset, limit = config.limit)
-            }
-            characterDao.getPagingSource()
-
-        },
-        remoteMediator = CharactersRemoteMediator(
-            this, remoteRepository
-        ),
-    ).flow
-        .map {
-            it.map { it.toCharacterData() }
-        }
+        pagingSourceFactory = { characterDao.getPagingSource() },
+        remoteMediator = remoteMediatorFactory.create(this),
+    ).flow.map { data -> data.map { it.toCharacterData() } }
 
 
     /**
@@ -101,9 +83,9 @@ internal class RoomCharacterLocalRepository @Inject constructor(
         characterDao.clear()
     }
 
+    override suspend fun getCharactersCount(): Int = characterDao.getCharactersCount()
+
     companion object {
         private const val PAGE_SIZE = 20
-//        private const val INITIAL_LOAD_FACTOR = 3
-
     }
 }
