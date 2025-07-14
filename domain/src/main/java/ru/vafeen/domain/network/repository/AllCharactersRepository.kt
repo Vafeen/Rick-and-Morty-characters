@@ -6,7 +6,7 @@ import ru.vafeen.domain.model.PaginationInfo
 import ru.vafeen.domain.network.ResponseResult
 
 /**
- * Interface for character data repository operations
+ * Interface for character data network repository operations
  */
 interface AllCharactersRepository {
     /**

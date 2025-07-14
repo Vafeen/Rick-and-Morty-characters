@@ -16,6 +16,7 @@ import java.time.ZonedDateTime
  * @property episodeIds List of episode IDs where character appears
  * @property apiUrl Direct URL to character's API endpoint
  * @property createdAt Timestamp when record was created
+ * @property nextKey Key for paging
  */
 data class CharacterData(
     val id: Int,
@@ -29,5 +30,6 @@ data class CharacterData(
     val imageUrl: String,
     val episodeIds: List<Int>,
     val apiUrl: String,
-    val createdAt: ZonedDateTime
+    val createdAt: ZonedDateTime,
+    val nextKey: Int?,
 )

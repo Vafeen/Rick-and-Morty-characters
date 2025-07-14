@@ -26,7 +26,7 @@ fun CharacterResponse.toDomain(): Pair<PaginationInfo, List<CharacterData>> {
     )
 
     // Обработка случая, когда results = null (хотя API Rick and Morty всегда возвращает массив)
-    val characters = results?.map { it.toDomain() } ?: emptyList()
+    val characters = results?.map { it.toDomain(pagination.nextPage) } ?: emptyList()
 
     return pagination to characters
 }
@@ -36,7 +36,7 @@ fun CharacterResponse.toDomain(): Pair<PaginationInfo, List<CharacterData>> {
  * @receiver CharacterDataDTO API character object
  * @return Domain model representation of the character
  */
-fun CharacterDataDTO.toDomain(): CharacterData = CharacterData(
+fun CharacterDataDTO.toDomain(nextKey: Int?): CharacterData = CharacterData(
     id = id,
     name = name,
     lifeStatus = when (status) {
@@ -57,7 +57,8 @@ fun CharacterDataDTO.toDomain(): CharacterData = CharacterData(
     imageUrl = image,
     episodeIds = episode.mapNotNull { it.extractId() },
     apiUrl = url,
-    createdAt = ZonedDateTime.parse(created)
+    createdAt = ZonedDateTime.parse(created),
+    nextKey = nextKey
 )
 
 /**
@@ -92,7 +93,8 @@ fun SingleCharacterDTO.toDomain(): CharacterData = CharacterData(
     imageUrl = image,
     episodeIds = episode.mapNotNull { it.extractId() },
     apiUrl = url,
-    createdAt = ZonedDateTime.parse(created)
+    createdAt = ZonedDateTime.parse(created),
+    nextKey = null // todo remove it
 )
 
 /**

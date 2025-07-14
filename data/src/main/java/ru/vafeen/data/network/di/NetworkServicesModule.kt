@@ -14,7 +14,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-internal class ServicesModule {
+internal class NetworkServicesModule {
     private val retrofit = Retrofit.Builder().baseUrl(APIInfo.BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .build()

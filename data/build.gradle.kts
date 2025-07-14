@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kapt)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.serialization)
 }
 
 android {
@@ -53,10 +54,13 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     kapt(libs.androidx.room.compiler)
+    implementation("androidx.room:room-paging:2.7.2")
     // Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     // Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    // Serialization
+    implementation(libs.kotlinx.serialization.json)
 }

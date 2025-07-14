@@ -5,7 +5,7 @@ import ru.vafeen.domain.model.PaginationInfo
 import ru.vafeen.domain.network.ResponseResult
 
 /**
- * Repository interface for filtering characters through API with various criteria.
+ * Network repository interface for filtering characters through API with various criteria.
  * Provides methods to retrieve paginated character data based on multiple filter parameters.
  */
 interface FilterCharactersRepository {
