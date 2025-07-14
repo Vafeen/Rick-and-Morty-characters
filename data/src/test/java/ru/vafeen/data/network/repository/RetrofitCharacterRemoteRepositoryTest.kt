@@ -1,17 +1,11 @@
-package ru.vafeen.data.network
+package ru.vafeen.data.network.repository
 
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import ru.vafeen.data.network.repository.RetrofitCharacterRemoteRepository
 import ru.vafeen.data.network.service.CharacterService
 import ru.vafeen.domain.model.Gender
 import ru.vafeen.domain.model.LifeStatus
@@ -55,7 +49,7 @@ class RetrofitCharacterRemoteRepositoryTest {
     /**
      * Tests successful character retrieval by valid ID.
      * Verifies:
-     * - Response is of type [ResponseResult.Success]
+     * - Response is of type [ru.vafeen.domain.network.ResponseResult.Success]
      * - All character fields are properly populated
      * - Basic field validations (non-empty strings, valid objects)
      */
@@ -63,20 +57,20 @@ class RetrofitCharacterRemoteRepositoryTest {
     fun `getCharacter returns success with valid character data`() = runTest {
         val result = repository.getCharacter(validCharacterId)
 
-        assertTrue(result is ResponseResult.Success)
+        Assert.assertTrue(result is ResponseResult.Success)
         val character = (result as ResponseResult.Success).data
 
-        assertEquals(validCharacterId, character.id)
-        assertFalse(character.name.isEmpty())
-        assertNotNull(character.lifeStatus)
-        assertFalse(character.species.isEmpty())
-        assertNotNull(character.gender)
-        assertNotNull(character.origin)
-        assertNotNull(character.currentLocation)
-        assertFalse(character.imageUrl.isEmpty())
-        assertTrue(character.episodeIds.isNotEmpty())
-        assertFalse(character.apiUrl.isEmpty())
-        assertNotNull(character.createdAt)
+        Assert.assertEquals(validCharacterId, character.id)
+        Assert.assertFalse(character.name.isEmpty())
+        Assert.assertNotNull(character.lifeStatus)
+        Assert.assertFalse(character.species.isEmpty())
+        Assert.assertNotNull(character.gender)
+        Assert.assertNotNull(character.origin)
+        Assert.assertNotNull(character.currentLocation)
+        Assert.assertFalse(character.imageUrl.isEmpty())
+        Assert.assertTrue(character.episodeIds.isNotEmpty())
+        Assert.assertFalse(character.apiUrl.isEmpty())
+        Assert.assertNotNull(character.createdAt)
     }
 
     /**
@@ -89,8 +83,8 @@ class RetrofitCharacterRemoteRepositoryTest {
     fun `getCharacter returns error for non-existent character`() = runTest {
         val result = repository.getCharacter(invalidCharacterId)
 
-        assertTrue(result is ResponseResult.Error)
-        assertFalse((result as ResponseResult.Error).stacktrace.isEmpty())
+        Assert.assertTrue(result is ResponseResult.Error)
+        Assert.assertFalse((result as ResponseResult.Error).stacktrace.isEmpty())
     }
 
     /**
@@ -101,8 +95,8 @@ class RetrofitCharacterRemoteRepositoryTest {
     fun `getCharacter returns 404 for zero ID`() = runTest {
         val result = repository.getCharacter(0)
 
-        assertTrue(result is ResponseResult.Error)
-        assertTrue((result as ResponseResult.Error).stacktrace.contains("404"))
+        Assert.assertTrue(result is ResponseResult.Error)
+        Assert.assertTrue((result as ResponseResult.Error).stacktrace.contains("404"))
     }
 
     /**
@@ -113,8 +107,8 @@ class RetrofitCharacterRemoteRepositoryTest {
     fun `getCharacter returns 404 for negative ID`() = runTest {
         val result = repository.getCharacter(-1)
 
-        assertTrue(result is ResponseResult.Error)
-        assertTrue((result as ResponseResult.Error).stacktrace.contains("404"))
+        Assert.assertTrue(result is ResponseResult.Error)
+        Assert.assertTrue((result as ResponseResult.Error).stacktrace.contains("404"))
     }
 
     /* Filtered Characters Tests */
@@ -134,12 +128,12 @@ class RetrofitCharacterRemoteRepositoryTest {
             status = "alive"
         )
 
-        assertTrue(result is ResponseResult.Success)
+        Assert.assertTrue(result is ResponseResult.Success)
         val (_, characters) = (result as ResponseResult.Success).data
 
-        assertTrue(characters.isNotEmpty())
-        assertTrue(characters.all { it.name.contains("Rick", ignoreCase = true) })
-        assertTrue(characters.all { it.lifeStatus == LifeStatus.ALIVE })
+        Assert.assertTrue(characters.isNotEmpty())
+        Assert.assertTrue(characters.all { it.name.contains("Rick", ignoreCase = true) })
+        Assert.assertTrue(characters.all { it.lifeStatus == LifeStatus.ALIVE })
     }
 
     /**
@@ -155,11 +149,11 @@ class RetrofitCharacterRemoteRepositoryTest {
             species = "Alien"
         )
 
-        assertTrue(result is ResponseResult.Success)
+        Assert.assertTrue(result is ResponseResult.Success)
         val characters = (result as ResponseResult.Success).data.second
 
-        assertTrue(characters.isNotEmpty())
-        assertTrue(characters.all { it.species.equals("Alien", ignoreCase = true) })
+        Assert.assertTrue(characters.isNotEmpty())
+        Assert.assertTrue(characters.all { it.species.equals("Alien", ignoreCase = true) })
     }
 
     /**
@@ -175,11 +169,11 @@ class RetrofitCharacterRemoteRepositoryTest {
             gender = "female"
         )
 
-        assertTrue(result is ResponseResult.Success)
+        Assert.assertTrue(result is ResponseResult.Success)
         val characters = (result as ResponseResult.Success).data.second
 
-        assertTrue(characters.isNotEmpty())
-        assertTrue(characters.all { it.gender == Gender.FEMALE })
+        Assert.assertTrue(characters.isNotEmpty())
+        Assert.assertTrue(characters.all { it.gender == Gender.FEMALE })
     }
 
     /**
@@ -192,12 +186,12 @@ class RetrofitCharacterRemoteRepositoryTest {
     fun `filter with only page parameter returns all characters`() = runTest {
         val result = repository.getCharacters(page = 1)
 
-        assertTrue(result is ResponseResult.Success)
+        Assert.assertTrue(result is ResponseResult.Success)
         val characters = (result as ResponseResult.Success).data.second
 
-        assertTrue(characters.isNotEmpty())
+        Assert.assertTrue(characters.isNotEmpty())
         val uniqueNames = characters.map { it.name }.toSet()
-        assertTrue(uniqueNames.size > 1)
+        Assert.assertTrue(uniqueNames.size > 1)
     }
 
     /**
@@ -212,8 +206,8 @@ class RetrofitCharacterRemoteRepositoryTest {
             status = "alive"
         )
 
-        assertTrue(result is ResponseResult.Success)
-        assertTrue((result as ResponseResult.Success).data.second.isEmpty())
+        Assert.assertTrue(result is ResponseResult.Success)
+        Assert.assertTrue((result as ResponseResult.Success).data.second.isEmpty())
     }
 
     /* Pagination Tests */
@@ -236,12 +230,12 @@ class RetrofitCharacterRemoteRepositoryTest {
             status = "alive"
         ) as ResponseResult.Success
 
-        assertNotEquals(
+        Assert.assertNotEquals(
             page1.data.second.first().id,
             page2.data.second.first().id
         )
-        assertTrue(page1.data.second.all { it.lifeStatus == LifeStatus.ALIVE })
-        assertTrue(page2.data.second.all { it.lifeStatus == LifeStatus.ALIVE })
+        Assert.assertTrue(page1.data.second.all { it.lifeStatus == LifeStatus.ALIVE })
+        Assert.assertTrue(page2.data.second.all { it.lifeStatus == LifeStatus.ALIVE })
     }
 
     /**
@@ -255,13 +249,13 @@ class RetrofitCharacterRemoteRepositoryTest {
     fun `pagination metadata is correctly parsed`() = runTest {
         val result = repository.getCharacters(page = 1)
 
-        assertTrue(result is ResponseResult.Success)
+        Assert.assertTrue(result is ResponseResult.Success)
         val (pagination, _) = (result as ResponseResult.Success).data
 
-        assertTrue(pagination.totalCount > 0)
-        assertTrue(pagination.totalPages > 0)
-        assertNotNull(pagination.nextPage)
-        assertNull(pagination.prevPage)
+        Assert.assertTrue(pagination.totalCount > 0)
+        Assert.assertTrue(pagination.totalPages > 0)
+        Assert.assertNotNull(pagination.nextPage)
+        Assert.assertNull(pagination.prevPage)
     }
 
     /* Edge Cases */
@@ -275,7 +269,7 @@ class RetrofitCharacterRemoteRepositoryTest {
         val filtered = repository.getCharacters(page = 1, name = "") as ResponseResult.Success
         val unfiltered = repository.getCharacters(page = 1) as ResponseResult.Success
 
-        assertEquals(unfiltered.data.second.size, filtered.data.second.size)
+        Assert.assertEquals(unfiltered.data.second.size, filtered.data.second.size)
     }
 
     /**
@@ -287,7 +281,7 @@ class RetrofitCharacterRemoteRepositoryTest {
         val result1 = repository.getCharacters(page = 1, name = "rick ") as ResponseResult.Success
         val result2 = repository.getCharacters(page = 1, name = "rick") as ResponseResult.Success
 
-        assertEquals(result1.data.second.size, result2.data.second.size)
+        Assert.assertEquals(result1.data.second.size, result2.data.second.size)
     }
 
     /**
@@ -298,7 +292,7 @@ class RetrofitCharacterRemoteRepositoryTest {
     fun `large page number returns empty list`() = runTest {
         val result = repository.getCharacters(page = 9999)
 
-        assertTrue(result is ResponseResult.Success)
-        assertTrue((result as ResponseResult.Success).data.second.isEmpty())
+        Assert.assertTrue(result is ResponseResult.Success)
+        Assert.assertTrue((result as ResponseResult.Success).data.second.isEmpty())
     }
 }

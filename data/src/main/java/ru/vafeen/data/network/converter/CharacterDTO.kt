@@ -73,13 +73,13 @@ fun SingleCharacterDTO.toDomain(): CharacterData = CharacterData(
 )
 
 /* Extension functions for enum conversions */
-private fun LifeStatusDTO.toDomain() = when (this) {
+internal fun LifeStatusDTO.toDomain() = when (this) {
     LifeStatusDTO.ALIVE -> LifeStatus.ALIVE
     LifeStatusDTO.DEAD -> LifeStatus.DEAD
     LifeStatusDTO.UNKNOWN -> LifeStatus.UNKNOWN
 }
 
-private fun GenderDTO.toDomain() = when (this) {
+internal fun GenderDTO.toDomain() = when (this) {
     GenderDTO.MALE -> Gender.MALE
     GenderDTO.FEMALE -> Gender.FEMALE
     GenderDTO.GENDERLESS -> Gender.GENDERLESS
@@ -87,7 +87,7 @@ private fun GenderDTO.toDomain() = when (this) {
 }
 
 /* URL processing extensions */
-private fun String.extractId(): Int? = split("/").lastOrNull()?.toIntOrNull()
+internal fun String.extractId(): Int? = split("/").lastOrNull()?.toIntOrNull()
 
-private fun String.extractPageNumber(): Int? =
+internal fun String.extractPageNumber(): Int? =
     split("page=").lastOrNull()?.takeWhile { it.isDigit() }?.toIntOrNull()

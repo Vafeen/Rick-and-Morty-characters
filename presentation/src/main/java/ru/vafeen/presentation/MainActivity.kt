@@ -18,28 +18,9 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject
-    lateinit var singleCharacterRemoteRepository: SingleCharacterRemoteRepository
-
-    @Inject
     lateinit var characterRemoteRepository: CharacterRemoteRepository
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        lifecycleScope.launch(Dispatchers.IO) {
-//            val result: ResponseResult<Pair<PaginationInfo, List<CharacterData>>> =
-//                filterCharactersRepository.filterCharacters(
-//                    name = "nonexistentcharacter123"
-//                )
-//            when (result) {
-//                is ResponseResult.Error -> {
-//                    Log.e("result", result.stacktrace)
-//                }
-//
-//                is ResponseResult.Success<Pair<PaginationInfo, List<CharacterData>>> -> {
-//                    Log.d("result", "${result.data}")
-//                }
-//            }
-//
-//        }
         enableEdgeToEdge()
         setContent {
             RickAndMortyCharactersTheme {
