@@ -3,19 +3,19 @@ package ru.vafeen.data.network.dto
 import com.google.gson.annotations.SerializedName
 
 /**
- * Character data transfer object (DTO) representing API response structure
- * @property id Unique identifier for the character
- * @property name Full name of the character
- * @property status Current life status (Alive/Dead/unknown)
- * @property species Biological species classification
- * @property type Subspecies or variant information (empty string if none)
- * @property gender Gender identity (Male/Female/Genderless/unknown)
- * @property origin Character's original location
- * @property location Character's last known location
- * @property image URL to character's avatar image (300x300px)
- * @property episode List of episode URLs where character appears
- * @property url Direct URL to this character's API endpoint
- * @property created ISO-8601 formatted creation timestamp
+ * Network DTO representing character data from API
+ * @property id The id of the character
+ * @property name The name of the character
+ * @property status The status of the character ('Alive', 'Dead' or 'unknown')
+ * @property species The species of the character
+ * @property type The type or subspecies of the character
+ * @property gender The gender of the character ('Female', 'Male', 'Genderless' or 'unknown')
+ * @property origin Name and link to the character's origin location
+ * @property location Name and link to the character's last known location endpoint
+ * @property image Link to the character's image (300x300px)
+ * @property episode List of episodes in which this character appeared
+ * @property url Link to the character's own URL endpoint
+ * @property created Time at which the character was created in the database
  */
 data class CharacterDataDTO(
     @SerializedName("id") val id: Int,

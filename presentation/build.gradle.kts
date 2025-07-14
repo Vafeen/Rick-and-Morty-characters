@@ -54,4 +54,7 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+
+    // Hilt (DI)
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 }

@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kapt)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.serialization)
 }
 
 android {
@@ -46,17 +47,23 @@ dependencies {
     api(project(":domain"))
     // Tests
     testImplementation(libs.junit)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+    testImplementation(libs.jetbrains.kotlin.test)
     // other libs
     //Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     kapt(libs.androidx.room.compiler)
+    implementation("androidx.room:room-paging:2.7.2")
     // Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     // Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    // Serialization
+    implementation(libs.kotlinx.serialization.json)
 }
