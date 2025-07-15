@@ -56,8 +56,13 @@ dependencies {
     kapt(libs.hilt.android.compiler)
 
     // Hilt (DI)
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation(libs.androidx.hilt.navigation.compose)
     // Основная библиотека Coil для Compose
-    implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation(libs.coil.compose)
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
+// Или, если нужны только базовые иконки:
+//    implementation("androidx.compose.material:material-icons-core:1.7.8")
 
+    implementation("androidx.compose.material:material:1.8.3")
+// или новее
 }

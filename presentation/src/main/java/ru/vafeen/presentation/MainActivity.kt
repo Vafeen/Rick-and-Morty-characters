@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
-import ru.vafeen.presentation.ui.screen.main_screen.CharactersScreen
+import ru.vafeen.presentation.ui.screen.characters_screen.CharactersScreen
 import ru.vafeen.presentation.ui.theme.AppTheme
 import ru.vafeen.presentation.ui.theme.MainTheme
 

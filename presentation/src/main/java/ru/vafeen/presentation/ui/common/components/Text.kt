@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import ru.vafeen.presentation.ui.common.utils.suitableColor
+import ru.vafeen.presentation.ui.theme.AppTheme
 
 /**
  * A customized Text component for the primary theme.
@@ -58,7 +59,7 @@ internal fun ThisThemeText(
 ) = Text(
     text = text,
     modifier = modifier,
-    color = Color.Black,
+    color = AppTheme.colors.text,
     fontSize = fontSize,
     fontStyle = fontStyle,
     fontWeight = fontWeight,
@@ -117,7 +118,7 @@ internal fun OppositeThemeText(
 ) = Text(
     text = text,
     modifier = modifier,
-    color = Color.White,
+    color = AppTheme.colors.background,
     fontSize = fontSize,
     fontStyle = fontStyle,
     fontWeight = fontWeight,
