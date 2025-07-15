@@ -136,6 +136,12 @@ internal fun CharactersScreen(sendRootIntent: (NavRootIntent) -> Unit) {
                                                 entity.id
                                             )
                                         )
+                                    },
+                                    isChosen = state.settings.yourCharacterId == entity.id,
+                                    changeIsChosen = {
+                                        viewModel.handleIntent(
+                                            CharactersIntent.SetIsMyCharacter(entity.id)
+                                        )
                                     }
                                 )
                             } else {

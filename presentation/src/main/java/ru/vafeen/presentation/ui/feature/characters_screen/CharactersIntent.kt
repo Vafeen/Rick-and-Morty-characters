@@ -34,4 +34,5 @@ internal sealed class CharactersIntent {
     data class ApplyFilters(val filtersState: FiltersState) : CharactersIntent()
     data class ChangeIsFavourite(val id: Int) : CharactersIntent()
     data class IsDataEmpty(val isEmpty: Boolean) : CharactersIntent()
+    data class SetIsMyCharacter(val id: Int) : CharactersIntent()
 }

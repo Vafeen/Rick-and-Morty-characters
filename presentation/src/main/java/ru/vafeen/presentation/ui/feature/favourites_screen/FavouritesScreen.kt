@@ -113,6 +113,12 @@ internal fun FavouritesScreen(sendRootIntent: (NavRootIntent) -> Unit) {
                                                 entity.id
                                             )
                                         )
+                                    },
+                                    isChosen = state.settings.yourCharacterId == entity.id,
+                                    changeIsChosen = {
+                                        viewModel.handleIntent(
+                                            FavouritesIntent.SetIsMyCharacter(entity.id)
+                                        )
                                     }
                                 )
                             } else {

@@ -1,5 +1,6 @@
 package ru.vafeen.presentation.ui.feature.characters_screen
 
+import ru.vafeen.domain.model.Settings
 import ru.vafeen.presentation.ui.feature.filters_bottomsheet.FiltersState
 
 /**
@@ -9,6 +10,7 @@ import ru.vafeen.presentation.ui.feature.filters_bottomsheet.FiltersState
  * @property isFilterBottomSheetVisible Flag indicating whether the filters bottom sheet is visible.
  */
 data class CharactersState(
+    val settings: Settings,
     val filtersState: FiltersState = FiltersState(),
     val isFilterBottomSheetVisible: Boolean = false,
     val favourites: List<Int> = listOf(),

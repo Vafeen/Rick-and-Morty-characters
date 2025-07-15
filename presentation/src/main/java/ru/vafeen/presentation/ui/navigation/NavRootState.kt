@@ -1,5 +1,6 @@
 package ru.vafeen.presentation.ui.navigation
 
+import ru.vafeen.domain.model.Settings
 import ru.vafeen.presentation.common.navigation.Screen
 
 /**
@@ -10,9 +11,11 @@ import ru.vafeen.presentation.common.navigation.Screen
  * @property isBottomBarVisible Indicates whether the bottom navigation bar is visible.
  */
 internal data class NavRootState(
+    val settings: Settings,
     val startScreen: Screen,
     val currentScreen: Screen = startScreen,
     val isBottomBarVisible: Boolean = false,
+    val isMyCharacterChosen: Boolean = false
 //    val release: Release? = null,
 //    val settings: Settings,
 //    val isUpdateInProgress: Boolean = false,

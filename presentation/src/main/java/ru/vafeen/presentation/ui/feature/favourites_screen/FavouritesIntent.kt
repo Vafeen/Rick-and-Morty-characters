@@ -30,4 +30,5 @@ internal sealed class FavouritesIntent {
      * @param isEmpty True if the favourites list is empty, false otherwise.
      */
     data class IsDataEmpty(val isEmpty: Boolean) : FavouritesIntent()
+    data class SetIsMyCharacter(val id: Int) : FavouritesIntent()
 }
