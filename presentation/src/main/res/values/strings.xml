@@ -19,6 +19,6 @@
     <string name="code">Исходный код</string>
     <string name="interface_str">Интерфейс</string>
     <string name="version">версия</string>
-    <string name="reset">Применить</string>
+    <string name="reset">Сбросить</string>
     <string name="apply_filters">Применить фильтры</string>
 </resources>
