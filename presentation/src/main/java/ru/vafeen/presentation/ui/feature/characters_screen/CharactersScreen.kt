@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
@@ -30,6 +31,7 @@ import ru.vafeen.presentation.R
 import ru.vafeen.presentation.ui.common.components.CharacterItem
 import ru.vafeen.presentation.ui.common.components.ErrorItem
 import ru.vafeen.presentation.ui.common.components.LoadingItem
+import ru.vafeen.presentation.ui.common.components.ThisThemeText
 import ru.vafeen.presentation.ui.common.utils.suitableColor
 import ru.vafeen.presentation.ui.navigation.NavRootIntent
 import ru.vafeen.presentation.ui.theme.AppTheme
@@ -49,7 +51,9 @@ internal fun CharactersScreen(sendRootIntent: (NavRootIntent) -> Unit) {
         )
     val characters = viewModel.charactersFlow.collectAsLazyPagingItems()
     val state by viewModel.state.collectAsState()
-
+    LaunchedEffect(characters.itemCount) {
+        viewModel.handleIntent(CharactersIntent.IsDataEmpty(characters.itemCount == 0))
+    }
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
@@ -91,9 +95,13 @@ internal fun CharactersScreen(sendRootIntent: (NavRootIntent) -> Unit) {
 
         PullToRefreshBox(
             modifier = Modifier.fillMaxSize(),
+            contentAlignment = if (state.dataIsEmpty) Alignment.Center else Alignment.TopCenter,
             isRefreshing = characters.loadState.refresh is LoadState.Loading,
             onRefresh = { viewModel.handleIntent(CharactersIntent.Refresh) }
         ) {
+            if (state.dataIsEmpty) {
+                ThisThemeText(stringResource(R.string.data_is_empty))
+            }
             when (characters.loadState.refresh) {
                 is LoadState.Error -> {
                     val error = characters.loadState.refresh as LoadState.Error
