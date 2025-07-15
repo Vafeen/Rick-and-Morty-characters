@@ -3,7 +3,9 @@ package ru.vafeen.data.local_database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import ru.vafeen.data.local_database.dao.CharacterDao
+import ru.vafeen.data.local_database.dao.FavouritesDao
 import ru.vafeen.data.local_database.entity.CharacterEntity
+import ru.vafeen.data.local_database.entity.FavouritesEntity
 
 /**
  * Room Database implementation for the application.
@@ -16,7 +18,8 @@ import ru.vafeen.data.local_database.entity.CharacterEntity
  * @see CharacterDao
  */
 @Database(
-    entities = [CharacterEntity::class],
+    entities = [CharacterEntity::class,
+        FavouritesEntity::class],
     version = 1,
     exportSchema = true
 )
@@ -27,6 +30,7 @@ internal abstract class AppDatabase : RoomDatabase() {
      * @return [CharacterDao] instance for database operations
      */
     abstract fun characterDao(): CharacterDao
+    abstract fun favouritesDao(): FavouritesDao
 
     companion object {
         /**

@@ -11,4 +11,5 @@ import ru.vafeen.presentation.ui.feature.filters_bottomsheet.FiltersState
 data class CharactersState(
     val filtersState: FiltersState = FiltersState(),
     val isFilterBottomSheetVisible: Boolean = false,
+    val favourites: List<Int> = listOf(),
 )

@@ -21,6 +21,8 @@ import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Transgender
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -30,6 +32,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.annotation.ExperimentalCoilApi
@@ -37,6 +41,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import ru.vafeen.domain.model.CharacterData
 import ru.vafeen.domain.model.Gender
+import ru.vafeen.presentation.R
 import ru.vafeen.presentation.ui.theme.AppTheme
 
 /**
@@ -53,6 +58,8 @@ import ru.vafeen.presentation.ui.theme.AppTheme
 @Composable
 internal fun CharacterItem(
     character: CharacterData,
+    isFavourite: Boolean,
+    changeIsFavourite: () -> Unit,
     modifier: Modifier = Modifier,
     placeholder: Painter? = null,
     errorImage: Painter? = null,
@@ -105,6 +112,15 @@ internal fun CharacterItem(
                 Column(
                     modifier = Modifier.fillMaxSize()
                 ) {
+                    IconButton(
+                        modifier = Modifier.align(Alignment.End),
+                        onClick = changeIsFavourite
+                    ) {
+                        Icon(
+                            painter = painterResource(if (isFavourite) R.drawable.favorite_full else R.drawable.favourite),
+                            contentDescription = stringResource(R.string.is_this_character_in_favourites)
+                        )
+                    }
                     // Species and type
                     CharacterDetailRow(
                         icon = Icons.Default.Pets,

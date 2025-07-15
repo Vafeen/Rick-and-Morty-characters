@@ -27,6 +27,7 @@ import ru.vafeen.presentation.common.navigation.getScreenFromRoute
 import ru.vafeen.presentation.ui.common.components.BottomBar
 import ru.vafeen.presentation.ui.feature.character_screen.CharacterScreen
 import ru.vafeen.presentation.ui.feature.characters_screen.CharactersScreen
+import ru.vafeen.presentation.ui.feature.favourites_screen.FavouritesScreen
 import ru.vafeen.presentation.ui.feature.profile_screen.ProfileScreen
 import ru.vafeen.presentation.ui.theme.AppTheme
 import ru.vafeen.presentation.ui.theme.MainTheme
@@ -75,11 +76,17 @@ internal fun NavRoot() {
                         contentDescription = stringResource(R.string.characters)
                     ),
                     BottomBarItem(
+                        screen = Screen.Favourites,
+                        icon = painterResource(R.drawable.favorite_full),
+                        contentDescription = stringResource(R.string.favourites_screen)
+                    ),
+                    BottomBarItem(
                         screen = Screen.Profile,
                         icon = painterResource(R.drawable.profile),
                         contentDescription = stringResource(R.string.profile)
                     ),
-                )
+
+                    )
 
                 if (state.isBottomBarVisible) {
                     BottomBar(
@@ -117,6 +124,7 @@ internal fun NavRoot() {
 
                     navigation<Screen.BottomBarScreens>(startDestination = Screen.Characters) {
                         composable<Screen.Characters> { CharactersScreen(sendRootIntent = viewModel::handleIntent) }
+                        composable<Screen.Favourites> { FavouritesScreen(sendRootIntent = viewModel::handleIntent) }
                         composable<Screen.Profile> { ProfileScreen(sendRootIntent = viewModel::handleIntent) }
                     }
                 }
