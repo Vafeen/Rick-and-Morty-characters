@@ -25,9 +25,9 @@ import ru.vafeen.presentation.common.bottom_bar.BottomBarItem
 import ru.vafeen.presentation.common.navigation.Screen
 import ru.vafeen.presentation.common.navigation.getScreenFromRoute
 import ru.vafeen.presentation.ui.common.components.BottomBar
-import ru.vafeen.presentation.ui.screen.character_screen.CharacterScreen
-import ru.vafeen.presentation.ui.screen.characters_screen.CharactersScreen
-import ru.vafeen.presentation.ui.screen.profile_screen.ProfileScreen
+import ru.vafeen.presentation.ui.feature.character_screen.CharacterScreen
+import ru.vafeen.presentation.ui.feature.characters_screen.CharactersScreen
+import ru.vafeen.presentation.ui.feature.profile_screen.ProfileScreen
 import ru.vafeen.presentation.ui.theme.AppTheme
 import ru.vafeen.presentation.ui.theme.MainTheme
 
@@ -120,6 +120,7 @@ internal fun NavRoot() {
                         composable<Screen.Profile> { ProfileScreen(sendRootIntent = viewModel::handleIntent) }
                     }
                 }
+
 
 //            state.release?.let {
 //                UpdateAvailable(release = it) {

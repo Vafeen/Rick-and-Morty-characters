@@ -1,4 +1,4 @@
-package ru.vafeen.presentation.ui.screen.character_screen
+package ru.vafeen.presentation.ui.feature.character_screen
 
 /**
  * Represents user intents/actions for the Character screen.

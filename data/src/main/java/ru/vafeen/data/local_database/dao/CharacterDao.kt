@@ -40,8 +40,24 @@ internal interface CharacterDao : DataAccessObject<CharacterEntity>,
      * @return Configured [PagingSource] that loads [CharacterEntity] items
      *         with integer keys representing page indices.
      */
-    @Query("SELECT * FROM characters")
-    fun getPagingSource(): PagingSource<Int, CharacterEntity>
+    @Query(
+        """
+    SELECT * FROM characters 
+    WHERE 
+        (:name IS NULL OR name LIKE '%' || :name || '%') AND
+        (:status IS NULL OR life_status = :status) AND
+        (:species IS NULL OR species = :species) AND
+        (:type IS NULL OR subtype = :type) AND
+        (:gender IS NULL OR gender = :gender)
+"""
+    )
+    fun getPagingSource(
+        name: String?,
+        status: String?,
+        species: String?,
+        type: String?,
+        gender: String?
+    ): PagingSource<Int, CharacterEntity>
 
     /**
      * Provides reactive stream of all characters with automatic updates.

@@ -1,4 +1,4 @@
-package ru.vafeen.presentation.ui.screen.character_screen
+package ru.vafeen.presentation.ui.feature.character_screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
@@ -53,7 +53,7 @@ internal fun CharacterScreen(
         PullToRefreshBox(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
+                .padding(top = paddingValues.calculateTopPadding()),
             contentAlignment = Alignment.Center,
             isRefreshing = state.isLoading,
             onRefresh = { viewModel.handleIntent(CharacterIntent.FetchData) }

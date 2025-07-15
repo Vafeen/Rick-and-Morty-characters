@@ -1,4 +1,4 @@
-package ru.vafeen.presentation.ui.screen.profile_screen
+package ru.vafeen.presentation.ui.feature.profile_screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.Text

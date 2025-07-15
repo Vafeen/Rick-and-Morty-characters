@@ -13,6 +13,7 @@ import ru.vafeen.data.local_database.converter.toEntity
 import ru.vafeen.data.local_database.dao.CharacterDao
 import ru.vafeen.domain.local_database.repository.CharacterLocalRepository
 import ru.vafeen.domain.model.CharacterData
+import ru.vafeen.domain.network.repository.CharacterRemoteRepository
 import javax.inject.Inject
 
 /**
@@ -29,7 +30,8 @@ import javax.inject.Inject
  */
 internal class RoomCharacterLocalRepository @Inject constructor(
     private val characterDao: CharacterDao,
-    private val remoteMediatorFactory: CharactersRemoteMediator.Factory
+    private val remoteMediatorFactory: CharactersRemoteMediator.Factory,
+    private val characterRemoteRepository: CharacterRemoteRepository,
 ) : CharacterLocalRepository {
 
     /**
@@ -57,14 +59,37 @@ internal class RoomCharacterLocalRepository @Inject constructor(
      * @return [Flow] of [PagingData]<[CharacterData]> for efficient paginated loading.
      */
     @OptIn(ExperimentalPagingApi::class)
-    override fun getPaged(): Flow<PagingData<CharacterData>> = Pager(
+    override fun getPaged(
+        name: String?,
+        status: String?,
+        species: String?,
+        type: String?,
+        gender: String?
+    ): Flow<PagingData<CharacterData>> = Pager(
         initialKey = 1,
         config = PagingConfig(
             pageSize = PAGE_SIZE,
             enablePlaceholders = true,
         ),
-        pagingSourceFactory = { characterDao.getPagingSource() },
-        remoteMediator = remoteMediatorFactory.create(this),
+        pagingSourceFactory = {
+            characterDao.getPagingSource(
+                name = name,
+                status = status,
+                species = species,
+                type = type,
+                gender = gender
+            )
+        },
+        remoteMediator = remoteMediatorFactory.create(this) { page ->
+            characterRemoteRepository.getCharacters(
+                name = name,
+                status = status,
+                species = species,
+                type = type,
+                gender = gender,
+                page = page
+            )
+        },
     ).flow.map { data -> data.map { it.toCharacterData() } }
 
     /**
