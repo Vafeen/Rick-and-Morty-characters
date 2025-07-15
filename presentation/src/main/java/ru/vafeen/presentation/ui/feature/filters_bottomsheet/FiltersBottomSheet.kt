@@ -29,7 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import ru.vafeen.domain.model.Gender
 import ru.vafeen.domain.model.LifeStatus
 import ru.vafeen.presentation.R
-import ru.vafeen.presentation.ui.common.components.ColorPickerDialogButton
+import ru.vafeen.presentation.ui.common.components.AppButton
 import ru.vafeen.presentation.ui.common.utils.getMainColorForThisTheme
 import ru.vafeen.presentation.ui.feature.filters_bottomsheet.Filters
 import ru.vafeen.presentation.ui.feature.filters_bottomsheet.FiltersEffect
@@ -168,13 +168,13 @@ fun FiltersBottomSheet(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                ColorPickerDialogButton(
+                AppButton(
                     onClick = { viewModel.handleEvent(FiltersIntent.ResetFilters) },
                     color = mainColor
                 ) {
                     Text(stringResource(R.string.reset))
                 }
-                ColorPickerDialogButton(
+                AppButton(
                     onClick = { viewModel.handleEvent(FiltersIntent.ApplyFilters) },
                     color = mainColor
                 ) {

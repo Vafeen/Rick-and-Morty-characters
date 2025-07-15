@@ -30,5 +30,11 @@ internal sealed class FavouritesIntent {
      * @param isEmpty True if the favourites list is empty, false otherwise.
      */
     data class IsDataEmpty(val isEmpty: Boolean) : FavouritesIntent()
+
+    /**
+     * Intent to set the user's own character.
+     *
+     * @param id The ID of the character to set as "my character".
+     */
     data class SetIsMyCharacter(val id: Int) : FavouritesIntent()
 }

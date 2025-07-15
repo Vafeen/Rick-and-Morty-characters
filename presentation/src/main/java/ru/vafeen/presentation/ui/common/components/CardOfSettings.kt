@@ -26,6 +26,16 @@ import ru.vafeen.presentation.ui.common.utils.generateRandomColor
 import ru.vafeen.presentation.ui.theme.AppTheme
 import ru.vafeen.presentation.ui.theme.FontSize
 
+/**
+ * A reusable card component for displaying settings options,
+ * with an icon, text, and optional additional content revealed on click.
+ *
+ * @param text The main text displayed on the card.
+ * @param icon A composable lambda that draws an icon, given a [Color] applied to the icon background.
+ * @param onClick Callback invoked when the card is clicked.
+ * @param additionalContentIsVisible Optional flag to conditionally show [additionalContent].
+ * @param additionalContent Optional composable content displayed below the main row when visible.
+ */
 @Composable
 internal fun CardOfSettings(
     text: String,

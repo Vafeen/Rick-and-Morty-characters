@@ -41,6 +41,14 @@ import ru.vafeen.presentation.ui.navigation.NavRootIntent
 import ru.vafeen.presentation.ui.theme.AppTheme
 import ru.vafeen.presentation.ui.theme.FontSize
 
+/**
+ * Composable screen displaying the app settings, including interface customization,
+ * contact information, and external links.
+ *
+ * Supports editing theme colors via a color picker dialog.
+ *
+ * @param sendRootIntent Function to send navigation intents to the root view model.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun SettingsScreen(sendRootIntent: (NavRootIntent) -> Unit) {
@@ -55,7 +63,10 @@ internal fun SettingsScreen(sendRootIntent: (NavRootIntent) -> Unit) {
         }
     }
 
+    // Handle back navigation with system back button or UI
     BackHandler { sendRootIntent(NavRootIntent.Back) }
+
+    // Collect one-time effects such as opening links or sending emails
     LaunchedEffect(null) {
         viewModel.effects.collect { effect ->
             when (effect) {
@@ -64,6 +75,7 @@ internal fun SettingsScreen(sendRootIntent: (NavRootIntent) -> Unit) {
             }
         }
     }
+
     Scaffold(
         containerColor = AppTheme.colors.background,
         modifier = Modifier.fillMaxSize(),
@@ -74,18 +86,21 @@ internal fun SettingsScreen(sendRootIntent: (NavRootIntent) -> Unit) {
                 .padding(top = innerPadding.calculateTopPadding())
         ) {
 
+            // Show color picker dialog if enabled in the state
             if (state.colorPickerDialogIsEditable) {
                 ColorPickerDialog(
                     firstColor = mainColor,
                     onDismissRequest = { viewModel.handleIntent(SettingsIntent.CloseColorEditDialog) },
-                    onChangeColorCallback = {
+                    onChangeColorCallback = { selectedColor ->
                         viewModel.handleIntent(SettingsIntent.SaveSettings { s ->
-                            if (dark) s.copy(darkThemeColor = it) else s.copy(lightThemeColor = it)
+                            if (dark) s.copy(darkThemeColor = selectedColor)
+                            else s.copy(lightThemeColor = selectedColor)
                         })
                     })
             }
 
             Spacer(modifier = Modifier.height(30.dp))
+
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -93,9 +108,8 @@ internal fun SettingsScreen(sendRootIntent: (NavRootIntent) -> Unit) {
                     .verticalScroll(rememberScrollState()),
             ) {
 
-
+                // Interface section header
                 Box(modifier = Modifier.fillMaxWidth()) {
-                    // name of section
                     ThisThemeText(
                         modifier = Modifier
                             .padding(10.dp)
@@ -104,17 +118,21 @@ internal fun SettingsScreen(sendRootIntent: (NavRootIntent) -> Unit) {
                         text = stringResource(R.string.interface_str)
                     )
                 }
-                // Color
-                CardOfSettings(text = stringResource(R.string.interface_color), icon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.palette),
-                        contentDescription = "change color of interface",
-                        tint = it.suitableColor()
-                    )
-                }, onClick = { viewModel.handleIntent(SettingsIntent.OpenColorEditDialog) })
 
+                // Interface color setting card
+                CardOfSettings(
+                    text = stringResource(R.string.interface_color),
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.palette),
+                            contentDescription = stringResource(R.string.interface_color),
+                            tint = it.suitableColor()
+                        )
+                    },
+                    onClick = { viewModel.handleIntent(SettingsIntent.OpenColorEditDialog) }
+                )
 
-                // name of section
+                // Contacts section header
                 ThisThemeText(
                     modifier = Modifier
                         .padding(10.dp)
@@ -123,31 +141,40 @@ internal fun SettingsScreen(sendRootIntent: (NavRootIntent) -> Unit) {
                     text = stringResource(R.string.contacts)
                 )
 
-                // CODE
-                CardOfSettings(text = stringResource(R.string.code), icon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.terminal),
-                        contentDescription = "view code",
-                        tint = it.suitableColor()
-                    )
-                }, onClick = { viewModel.handleIntent(SettingsIntent.OpenLink(Link.CODE)) })
+                // "Code" external link card
+                CardOfSettings(
+                    text = stringResource(R.string.code),
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.terminal),
+                            contentDescription = stringResource(R.string.code),
+                            tint = it.suitableColor()
+                        )
+                    },
+                    onClick = { viewModel.handleIntent(SettingsIntent.OpenLink(Link.CODE)) }
+                )
 
-                CardOfSettings(text = stringResource(R.string.report_a_bug), icon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.bug_report),
-                        contentDescription = "view code",
-                        tint = it.suitableColor()
-                    )
-                }, onClick = { viewModel.handleIntent(SettingsIntent.SendEmail(Link.MAIL)) })
+                // "Report a bug" email card
+                CardOfSettings(
+                    text = stringResource(R.string.report_a_bug),
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.bug_report),
+                            contentDescription = stringResource(R.string.report_a_bug),
+                            tint = it.suitableColor()
+                        )
+                    },
+                    onClick = { viewModel.handleIntent(SettingsIntent.SendEmail(Link.MAIL)) }
+                )
 
-                // version
+                // App version text aligned to the end
                 ThisThemeText(
                     modifier = Modifier
                         .padding(10.dp)
                         .padding(bottom = 20.dp)
                         .align(Alignment.End),
                     fontSize = FontSize.small17,
-                    text = "${stringResource(R.string.version)} ${LocalContext.current.getVersionName()}"
+                    text = "${stringResource(R.string.version)} ${context.getVersionName()}"
                 )
             }
         }

@@ -20,6 +20,7 @@ import ru.vafeen.domain.service.SettingsManager
 /**
  * ViewModel for managing filter UI state and user interactions in the filters bottom sheet.
  *
+ * @property settingsManager Manager to observe app settings.
  * @property initialState The initial filters state when the ViewModel is created.
  */
 @HiltViewModel(assistedFactory = FiltersViewModel.Factory::class)

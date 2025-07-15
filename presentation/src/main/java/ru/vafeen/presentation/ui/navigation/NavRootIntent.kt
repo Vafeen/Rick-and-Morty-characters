@@ -44,7 +44,4 @@ internal sealed class NavRootIntent {
      * Intent to navigate back in the navigation stack.
      */
     data object Back : NavRootIntent()
-
-//    data object CheckUpdates : NavRootIntent()
-//    data object Update : NavRootIntent()
 }

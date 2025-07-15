@@ -1,6 +1,5 @@
 package ru.vafeen.presentation.ui.common.components
 
-
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -33,7 +32,15 @@ import ru.vafeen.domain.model.CharacterData
 import ru.vafeen.domain.model.Gender
 import ru.vafeen.presentation.ui.theme.AppTheme
 
-
+/**
+ * Composable which displays detailed content for a character.
+ *
+ * Shows character image, status, details like species, gender,
+ * origin and current location, and related episodes.
+ *
+ * @param character The [CharacterData] to display.
+ * @param modifier Optional [Modifier] for styling.
+ */
 @Composable
 internal fun CharacterContent(
     character: CharacterData,
@@ -44,7 +51,7 @@ internal fun CharacterContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        // Character Image
+        // Character Image with status badge overlay
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -60,7 +67,7 @@ internal fun CharacterContent(
                 modifier = Modifier.fillMaxSize()
             )
 
-            // Status badge overlay
+            // Status badge overlay at top end
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -70,13 +77,13 @@ internal fun CharacterContent(
             }
         }
 
-        // Character Details
+        // Details section
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // Name and basic info
+            // Character name
             Text(
                 text = character.name,
                 style = MaterialTheme.typography.headlineLarge,
@@ -85,7 +92,7 @@ internal fun CharacterContent(
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            // Species and Type
+            // Species and optional type displayed in one line
             CharacterDetailRow(
                 icon = Icons.Default.Pets,
                 text = buildString {
@@ -96,7 +103,7 @@ internal fun CharacterContent(
                 }
             )
 
-            // Gender
+            // Gender with corresponding icon
             CharacterDetailRow(
                 icon = when (character.gender) {
                     Gender.MALE -> Icons.Default.Male
@@ -110,7 +117,7 @@ internal fun CharacterContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Origin Location Card
+            // Origin location card
             InfoCard(
                 title = "Origin",
                 icon = Icons.Default.Public,
@@ -119,7 +126,7 @@ internal fun CharacterContent(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Current Location Card
+            // Last known location card
             InfoCard(
                 title = "Last Known Location",
                 icon = Icons.Default.Place,
@@ -128,7 +135,7 @@ internal fun CharacterContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Episodes Section
+            // Episodes header
             Text(
                 text = "Episodes (${character.episodeIds.size})",
                 style = MaterialTheme.typography.titleMedium,
@@ -137,7 +144,7 @@ internal fun CharacterContent(
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            // Simple episode list
+            // List of episodes
             character.episodeIds.forEach { episodeId ->
                 Text(
                     text = "Episode $episodeId",
@@ -147,7 +154,7 @@ internal fun CharacterContent(
                 )
             }
 
-            // Created date
+            // Character creation date
             ThisThemeText(
                 text = "Created: ${character.createdAt.toLocalDate()}",
                 style = MaterialTheme.typography.bodySmall,

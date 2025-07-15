@@ -14,7 +14,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import ru.vafeen.presentation.common.navigation.Screen
 import ru.vafeen.presentation.ui.common.components.CharacterContent
 import ru.vafeen.presentation.ui.common.components.CharacterTopAppBar
 import ru.vafeen.presentation.ui.common.components.ErrorItem
@@ -26,7 +25,6 @@ import ru.vafeen.presentation.ui.theme.AppTheme
 /**
  * Composable screen to display details of a character.
  *
- * @param character The [Screen.Character] instance containing the character ID.
  * @param sendRootIntent Function to send navigation intents to root view model.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,6 +37,7 @@ internal fun ProfileScreen(sendRootIntent: (NavRootIntent) -> Unit) {
             isSystemInDarkTheme()
         ) ?: AppTheme.colors.mainColor
     )
+    // Handle back press to navigate back via root intent
     BackHandler { sendRootIntent(NavRootIntent.Back) }
     Scaffold(
         topBar = {
@@ -62,6 +61,7 @@ internal fun ProfileScreen(sendRootIntent: (NavRootIntent) -> Unit) {
             isRefreshing = state.isLoading,
             onRefresh = { viewModel.handleIntent(CharacterIntent.FetchData) }
         ) {
+            // Show error UI if loading failed
             state.let { state ->
                 if (state.isError) {
                     ErrorItem(
@@ -71,6 +71,7 @@ internal fun ProfileScreen(sendRootIntent: (NavRootIntent) -> Unit) {
                         viewModel.handleIntent(CharacterIntent.FetchData)
                     }
                 }
+                // Show character content when loaded without errors
                 if (!state.isLoading && !state.isError && state.characterData != null) {
                     CharacterContent(character = state.characterData)
                 }
@@ -82,4 +83,3 @@ internal fun ProfileScreen(sendRootIntent: (NavRootIntent) -> Unit) {
 
 
 }
-

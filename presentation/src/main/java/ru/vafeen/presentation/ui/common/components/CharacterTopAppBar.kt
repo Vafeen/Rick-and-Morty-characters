@@ -17,6 +17,17 @@ import androidx.compose.ui.unit.dp
 import ru.vafeen.presentation.R
 import ru.vafeen.presentation.ui.common.utils.suitableColor
 
+/**
+ * Top app bar shown on the character detail screen.
+ *
+ * Displays the character's name as the title, with a back navigation icon.
+ * The colors are adapted to the provided container background color to ensure proper contrast.
+ *
+ * @param containerColor Background color of the app bar container.
+ * @param characterName Name of the character to display in the title.
+ * @param onBackClick Callback invoked when the back navigation icon is clicked.
+ * @param modifier Optional modifier for the top app bar.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CharacterTopAppBar(

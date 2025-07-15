@@ -4,7 +4,6 @@
     <string name="characters">Герои</string>
     <string name="profile_screen">Экран профиля</string>
     <string name="settings_screen">Экран настроек</string>
-
     <string name="back">Назад</string>
     <string name="is_this_character_in_favourites">Добавлен ли персонаж в избранное </string>
     <string name="favourites_screen">Экран избранного</string>

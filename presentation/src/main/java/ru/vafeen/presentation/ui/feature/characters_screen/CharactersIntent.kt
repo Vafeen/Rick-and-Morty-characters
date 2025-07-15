@@ -32,7 +32,25 @@ internal sealed class CharactersIntent {
      * @param filters The state representing currently selected filters.
      */
     data class ApplyFilters(val filters: Filters) : CharactersIntent()
+
+    /**
+     * Intent to toggle favorite status of a character.
+     *
+     * @param id The ID of the character whose favorite status is to be changed.
+     */
     data class ChangeIsFavourite(val id: Int) : CharactersIntent()
+
+    /**
+     * Intent to indicate whether the data list is empty.
+     *
+     * @param isEmpty True if the data list is empty, false otherwise.
+     */
     data class IsDataEmpty(val isEmpty: Boolean) : CharactersIntent()
+
+    /**
+     * Intent to set the user's own character.
+     *
+     * @param id The ID of the character to set as "my character".
+     */
     data class SetIsMyCharacter(val id: Int) : CharactersIntent()
 }

@@ -12,8 +12,20 @@ import androidx.compose.ui.unit.dp
 import ru.vafeen.presentation.ui.common.utils.suitableColor
 import ru.vafeen.presentation.ui.theme.AppTheme
 
+/**
+ * A styled outlined button used within the color picker dialog.
+ *
+ * The button adapts its colors according to the provided [color], ensuring sufficient contrast,
+ * and supports enabled/disabled states.
+ *
+ * @param onClick Callback invoked when the button is clicked.
+ * @param color The background color of the button.
+ * @param modifier Optional [Modifier] for styling.
+ * @param enabled Flag indicating if the button is enabled or disabled.
+ * @param content Composable lambda defining the button's content.
+ */
 @Composable
-internal fun ColorPickerDialogButton(
+internal fun AppButton(
     onClick: () -> Unit,
     color: Color,
     modifier: Modifier = Modifier,

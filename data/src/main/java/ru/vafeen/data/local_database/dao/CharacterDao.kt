@@ -36,7 +36,13 @@ internal interface CharacterDao : DataAccessObject<CharacterEntity>,
 
     /**
      * Creates a [PagingSource] for integration with Jetpack Paging 3 library.
+     * Supports filtering by name, status, species, type, and gender.
      *
+     * @param name Optional filter for character name (substring match).
+     * @param status Optional filter for life status.
+     * @param species Optional filter for species.
+     * @param type Optional filter for type/subtype.
+     * @param gender Optional filter for gender.
      * @return Configured [PagingSource] that loads [CharacterEntity] items
      *         with integer keys representing page indices.
      */
@@ -59,18 +65,24 @@ internal interface CharacterDao : DataAccessObject<CharacterEntity>,
         gender: String?,
     ): PagingSource<Int, CharacterEntity>
 
+    /**
+     * Creates a [PagingSource] for favourite characters filtered by their IDs.
+     *
+     * @param favourites List of favourite character IDs.
+     * @return [PagingSource] that loads favourite [CharacterEntity] items.
+     *         The list must not be empty.
+     */
     @Query("SELECT * FROM characters WHERE id IN (:favourites)")
     fun getFavouritesPagingSource(
         favourites: List<Int>,
     ): PagingSource<Int, CharacterEntity>
 
-
     /**
-     * Provides reactive stream of all characters with automatic updates.
+     * Provides a reactive [Flow] of all characters with automatic updates.
      *
-     * @return [Flow] emitting the complete dataset that automatically
-     *         updates on any changes to the 'characters' table.
-     *         Emits empty list if table is empty.
+     * @return [Flow] emitting the complete dataset that updates automatically
+     *         on any changes to the 'characters' table.
+     *         Emits an empty list if the table is empty.
      *
      * @see FlowGetAllImplementation.getAll
      */

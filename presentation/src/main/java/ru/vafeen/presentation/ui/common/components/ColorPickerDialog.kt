@@ -38,6 +38,16 @@ import ru.vafeen.presentation.ui.common.utils.suitableColor
 import ru.vafeen.presentation.ui.theme.AppTheme
 import ru.vafeen.presentation.ui.theme.FontSize
 
+/**
+ * Dialog which allows the user to pick a color using a color picker UI.
+ *
+ * Displays a preview bar, color picker widget, and action buttons for cancelling,
+ * applying the color, or resetting to the default theme color.
+ *
+ * @param firstColor The initial color shown when the dialog opens.
+ * @param onDismissRequest Callback invoked when the dialog should be dismissed.
+ * @param onChangeColorCallback Callback invoked with the newly selected color when user applies changes.
+ */
 @Composable
 internal fun ColorPickerDialog(
     firstColor: Color,
@@ -46,10 +56,7 @@ internal fun ColorPickerDialog(
 ) {
     val defaultColor = AppTheme.colors.mainColor
     val colorState = rememberAlwanState(initialColor = firstColor)
-    var newColor by remember {
-        mutableStateOf(firstColor)
-    }
-
+    var newColor by remember { mutableStateOf(firstColor) }
 
     Dialog(
         onDismissRequest = onDismissRequest,
@@ -61,8 +68,7 @@ internal fun ColorPickerDialog(
             border = BorderStroke(width = 2.dp, color = AppTheme.colors.text)
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
@@ -91,21 +97,21 @@ internal fun ColorPickerDialog(
                             icon = painterResource(R.drawable.profile),
                             contentDescription = stringResource(R.string.profile_screen)
                         )
-                    ), {}
+                    ),
+                    onClick = {}
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // color picker
+                // Color picker widget
                 Alwan(
-                    onColorChanged = {
-                        newColor = it
-                    },
+                    onColorChanged = { color -> newColor = color },
                     modifier = Modifier.size(300.dp),
                     state = colorState,
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -113,7 +119,7 @@ internal fun ColorPickerDialog(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    ColorPickerDialogButton(
+                    AppButton(
                         onClick = onDismissRequest,
                         color = newColor,
                     ) {
@@ -122,7 +128,7 @@ internal fun ColorPickerDialog(
                             color = newColor.suitableColor()
                         )
                     }
-                    if (firstColor != defaultColor)
+                    if (firstColor != defaultColor) {
                         IconButton(onClick = {
                             onChangeColorCallback(defaultColor)
                             onDismissRequest()
@@ -133,13 +139,15 @@ internal fun ColorPickerDialog(
                                 tint = AppTheme.colors.text
                             )
                         }
-                    ColorPickerDialogButton(
+                    }
+                    AppButton(
                         enabled = newColor.toArgb() != firstColor.toArgb(),
                         color = newColor,
                         onClick = {
                             onChangeColorCallback(newColor)
                             onDismissRequest()
-                        }) {
+                        }
+                    ) {
                         Text(
                             text = stringResource(R.string.apply),
                             color = newColor.suitableColor()

@@ -24,11 +24,12 @@ import ru.vafeen.presentation.ui.feature.characters_screen.CharactersEffect
 import ru.vafeen.presentation.ui.navigation.NavRootIntent
 
 /**
- * ViewModel for the Favourites screen handling favourite characters list
+ * ViewModel for the Favourites screen handling favorite characters list
  * and related user actions including refresh and navigation.
  *
  * @property characterLocalRepository Repository for accessing local character data.
  * @property favouritesLocalRepository Repository for managing favourite characters.
+ * @property settingsManager Manager for app settings state.
  * @property sendRootIntent Function for sending navigation intents to the root navigation handler.
  */
 @HiltViewModel(assistedFactory = FavouritesViewModel.Factory::class)
@@ -42,7 +43,7 @@ internal class FavouritesViewModel @AssistedInject constructor(
 
     /**
      * Flow of paged favourite character data.
-     * It observes the list of favourite IDs and maps them to a paged flow of [CharacterEntity].
+     * It observes the list of favourite IDs and maps them to a paged flow of character data.
      * Result is cached within [viewModelScope].
      */
     @OptIn(ExperimentalCoroutinesApi::class)

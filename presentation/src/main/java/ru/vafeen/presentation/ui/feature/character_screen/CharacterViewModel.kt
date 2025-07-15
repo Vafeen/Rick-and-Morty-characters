@@ -18,8 +18,9 @@ import ru.vafeen.domain.use_case.FetchCharacterDataUseCase
 /**
  * ViewModel for the Character screen that handles loading and exposing character data.
  *
- * @property id The unique character ID to load data for.
+ * @property settingsManager Manager for application settings.
  * @property fetchCharacterDataUseCase Use case to fetch character data.
+ * @property id The unique character ID to load data for.
  */
 @HiltViewModel(assistedFactory = CharacterViewModel.Factory::class)
 internal class CharacterViewModel @AssistedInject constructor(
@@ -27,8 +28,20 @@ internal class CharacterViewModel @AssistedInject constructor(
     private val fetchCharacterDataUseCase: FetchCharacterDataUseCase,
     @Assisted private val id: Int,
 ) : ViewModel() {
+
+    /**
+     * [StateFlow] of application settings, exposed from [settingsManager].
+     */
     val settingsFlow = settingsManager.settingsFlow
+
+    /**
+     * Backing [MutableStateFlow] holding the current UI state of the screen.
+     */
     private val _state = MutableStateFlow(CharacterState(settings = settingsFlow.value))
+
+    /**
+     * Read-only [StateFlow] of the current UI state.
+     */
     val state = _state.asStateFlow()
 
     init {
@@ -36,6 +49,7 @@ internal class CharacterViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             fetchData()
         }
+        // Observe changes in settings and update UI state accordingly.
         viewModelScope.launch(Dispatchers.IO) {
             settingsFlow.collect { settings ->
                 _state.update {
@@ -46,7 +60,7 @@ internal class CharacterViewModel @AssistedInject constructor(
     }
 
     /**
-     * Handles incoming intents from the UI.
+     * Handles incoming intents (actions) from the UI layer.
      *
      * @param intent The [CharacterIntent] to handle.
      */
@@ -59,7 +73,10 @@ internal class CharacterViewModel @AssistedInject constructor(
     }
 
     /**
-     * Fetches character data via the use case and updates the UI state accordingly.
+     * Fetches character data using the provided use case and updates the UI state.
+     *
+     * Loads the data asynchronously, sets loading and error states accordingly.
+     * Also simulates a loading delay for demonstration.
      */
     private suspend fun fetchData() {
         _state.update { it.copy(isLoading = true, isError = false) }
@@ -79,10 +96,17 @@ internal class CharacterViewModel @AssistedInject constructor(
     }
 
     /**
-     * Assisted factory to create [CharacterViewModel] instances with parameterized constructor.
+     * Assisted factory interface to create instances of [CharacterViewModel]
+     * with a required parameter [id].
      */
     @AssistedFactory
     interface Factory {
+        /**
+         * Creates an instance of [CharacterViewModel] with the specific character ID.
+         *
+         * @param id The unique character ID.
+         * @return The created [CharacterViewModel] instance.
+         */
         fun create(id: Int): CharacterViewModel
     }
 }
