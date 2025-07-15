@@ -23,5 +23,12 @@ internal sealed class FavouritesIntent {
      * @param id The ID of the character to toggle favourite status.
      */
     data class ChangeIsFavourite(val id: Int) : FavouritesIntent()
+
+    /**
+     * Intent indicating whether the favourites data is empty.
+     *
+     * @param isEmpty True if the favourites list is empty, false otherwise.
+     */
     data class IsDataEmpty(val isEmpty: Boolean) : FavouritesIntent()
+    data class SetIsMyCharacter(val id: Int) : FavouritesIntent()
 }

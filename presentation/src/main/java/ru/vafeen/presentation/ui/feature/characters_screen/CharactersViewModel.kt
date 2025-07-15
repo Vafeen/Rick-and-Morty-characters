@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.vafeen.domain.local_database.repository.CharacterLocalRepository
 import ru.vafeen.domain.local_database.repository.FavouritesLocalRepository
+import ru.vafeen.domain.service.SettingsManager
 import ru.vafeen.presentation.common.navigation.Screen
 import ru.vafeen.presentation.ui.feature.filters_bottomsheet.FiltersState
 import ru.vafeen.presentation.ui.navigation.NavRootIntent
@@ -32,8 +33,10 @@ import ru.vafeen.presentation.ui.navigation.NavRootIntent
 internal class CharactersViewModel @AssistedInject constructor(
     private val characterLocalRepository: CharacterLocalRepository,
     private val favouritesLocalRepository: FavouritesLocalRepository,
+    private val settingsManager: SettingsManager,
     @Assisted private val sendRootIntent: (NavRootIntent) -> Unit,
 ) : ViewModel() {
+    private val settingsFlow = settingsManager.settingsFlow
 
     // Current filter state backing flow
     private val _currentFilters = MutableStateFlow(FiltersState())
@@ -49,8 +52,17 @@ internal class CharactersViewModel @AssistedInject constructor(
         }
         .cachedIn(viewModelScope)
 
-    private val _state = MutableStateFlow(CharactersState())
+    private val _state = MutableStateFlow(CharactersState(settings = settingsFlow.value))
     val state = _state.asStateFlow()
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            settingsFlow.collect { settings ->
+                _state.update { it.copy(settings = settings) }
+            }
+        }
+
+    }
 
     private val _effects = MutableSharedFlow<CharactersEffect>()
 
@@ -82,7 +94,14 @@ internal class CharactersViewModel @AssistedInject constructor(
                 is CharactersIntent.ChangeFilterVisibility -> changeFilterVisibility(intent.isVisible)
                 is CharactersIntent.ChangeIsFavourite -> changeIsFavourite(intent.id)
                 is CharactersIntent.IsDataEmpty -> isDataEmpty(intent.isEmpty)
+                is CharactersIntent.SetIsMyCharacter -> setIsMyCharacter(intent.id)
             }
+        }
+    }
+
+    private fun setIsMyCharacter(id: Int?) {
+        settingsManager.save {
+            it.copy(yourCharacterId = if (it.yourCharacterId == id) null else id)
         }
     }
 

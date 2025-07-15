@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.vafeen.domain.local_database.repository.CharacterLocalRepository
 import ru.vafeen.domain.local_database.repository.FavouritesLocalRepository
+import ru.vafeen.domain.service.SettingsManager
 import ru.vafeen.presentation.common.navigation.Screen
 import ru.vafeen.presentation.ui.feature.characters_screen.CharactersEffect
 import ru.vafeen.presentation.ui.navigation.NavRootIntent
@@ -34,8 +35,10 @@ import ru.vafeen.presentation.ui.navigation.NavRootIntent
 internal class FavouritesViewModel @AssistedInject constructor(
     private val characterLocalRepository: CharacterLocalRepository,
     private val favouritesLocalRepository: FavouritesLocalRepository,
+    private val settingsManager: SettingsManager,
     @Assisted private val sendRootIntent: (NavRootIntent) -> Unit,
 ) : ViewModel() {
+    private val settingsFlow = settingsManager.settingsFlow
 
     /**
      * Flow of paged favourite character data.
@@ -43,13 +46,14 @@ internal class FavouritesViewModel @AssistedInject constructor(
      * Result is cached within [viewModelScope].
      */
     @OptIn(ExperimentalCoroutinesApi::class)
-    val favouriteCharactersFlow = favouritesLocalRepository.getAllFavourites()
-        .flatMapLatest { favourites ->
+    val favouriteCharactersFlow =
+        favouritesLocalRepository.getAllFavourites().flatMapLatest { favourites ->
             favourites.toPagingFlow()
-        }
-        .cachedIn(viewModelScope)
-    private val _state = MutableStateFlow(FavouritesState())
+        }.cachedIn(viewModelScope)
+
+    private val _state = MutableStateFlow(FavouritesState(settings = settingsFlow.value))
     val state = _state.asStateFlow()
+
     private val _effects = MutableSharedFlow<CharactersEffect>()
 
     /**
@@ -57,6 +61,14 @@ internal class FavouritesViewModel @AssistedInject constructor(
      * e.g., refresh requests triggered by user actions.
      */
     val effects = _effects.asSharedFlow()
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            settingsFlow.collect { settings ->
+                _state.update { it.copy(settings = settings) }
+            }
+        }
+    }
 
     /**
      * Handles user intents (actions) from the UI.
@@ -70,10 +82,22 @@ internal class FavouritesViewModel @AssistedInject constructor(
                 is FavouritesIntent.ClickToCharacter -> clickToCharacter(intent.id)
                 is FavouritesIntent.ChangeIsFavourite -> changeIsFavourite(intent.id)
                 is FavouritesIntent.IsDataEmpty -> dataIsEmpty(intent.isEmpty)
+                is FavouritesIntent.SetIsMyCharacter -> setIsMyCharacter(intent.id)
             }
         }
     }
 
+    private fun setIsMyCharacter(id: Int?) {
+        settingsManager.save {
+            it.copy(yourCharacterId = if (it.yourCharacterId == id) null else id)
+        }
+    }
+
+    /**
+     * Updates the current state to reflect whether the favourites list is empty.
+     *
+     * @param isEmpty True if the favourites list is empty, false otherwise.
+     */
     private fun dataIsEmpty(isEmpty: Boolean) {
         _state.update { it.copy(dataIsEmpty = isEmpty) }
     }
@@ -108,8 +132,7 @@ internal class FavouritesViewModel @AssistedInject constructor(
      * @receiver List of favourite character IDs.
      * @return Paging data flow of favourite characters.
      */
-    private fun List<Int>.toPagingFlow() =
-        characterLocalRepository.getFavourites(favourites = this)
+    private fun List<Int>.toPagingFlow() = characterLocalRepository.getFavourites(favourites = this)
 
     /**
      * Assisted factory to create [FavouritesViewModel] instances with parameterized constructor.

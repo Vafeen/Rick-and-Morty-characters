@@ -60,6 +60,8 @@ internal fun CharacterItem(
     character: CharacterData,
     isFavourite: Boolean,
     changeIsFavourite: () -> Unit,
+    isChosen: Boolean,
+    changeIsChosen: () -> Unit,
     modifier: Modifier = Modifier,
     placeholder: Painter? = null,
     errorImage: Painter? = null,
@@ -112,14 +114,25 @@ internal fun CharacterItem(
                 Column(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    IconButton(
-                        modifier = Modifier.align(Alignment.End),
-                        onClick = changeIsFavourite
-                    ) {
-                        Icon(
-                            painter = painterResource(if (isFavourite) R.drawable.favorite_full else R.drawable.favourite),
-                            contentDescription = stringResource(R.string.is_this_character_in_favourites)
-                        )
+                    Row(modifier = Modifier.align(Alignment.End)) {
+                        IconButton(
+                            onClick = changeIsChosen
+                        ) {
+                            Icon(
+                                painter = painterResource(if (isChosen) R.drawable.chosen_character else R.drawable.character),
+                                contentDescription = stringResource(R.string.is_this_character_is_your)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        IconButton(
+                            onClick = changeIsFavourite
+                        ) {
+                            Icon(
+                                painter = painterResource(if (isFavourite) R.drawable.favorite_full else R.drawable.favourite),
+                                contentDescription = stringResource(R.string.is_this_character_in_favourites)
+                            )
+                        }
+
                     }
                     // Species and type
                     CharacterDetailRow(

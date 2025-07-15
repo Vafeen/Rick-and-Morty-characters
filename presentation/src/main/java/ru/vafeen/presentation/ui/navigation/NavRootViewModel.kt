@@ -3,6 +3,7 @@ package ru.vafeen.presentation.ui.navigation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.vafeen.domain.service.SettingsManager
 import ru.vafeen.presentation.common.navigation.Screen
 import ru.vafeen.presentation.common.navigation.screenWithBottomBar
 import javax.inject.Inject
@@ -20,8 +22,11 @@ import javax.inject.Inject
  * It processes navigation intents, updates UI state, and emits navigation effects
  * to be observed by the UI layer.
  */
-internal class NavRootViewModel @Inject constructor() : ViewModel() {
-
+@HiltViewModel
+internal class NavRootViewModel @Inject constructor(
+    private val settingsManager: SettingsManager
+) : ViewModel() {
+    private val settingsFlow = settingsManager.settingsFlow
     private val _effects = MutableSharedFlow<NavRootEffect>()
     val effects = _effects.asSharedFlow()
 
@@ -29,9 +34,26 @@ internal class NavRootViewModel @Inject constructor() : ViewModel() {
         NavRootState(
             startScreen = Screen.BottomBarScreens, // Screen.SignIn(number = "", password = ""),
             isBottomBarVisible = true,
+            settings = settingsFlow.value
         )
     )
     val state = _state.asStateFlow()
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            settingsFlow.collect { settings ->
+                _state.update { it.copy(settings = settings) }
+            }
+        }
+    }
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            settingsManager.settingsFlow.collect { settings ->
+                _state.update { it.copy(isMyCharacterChosen = settings.yourCharacterId != null) }
+            }
+        }
+    }
 
     /**
      * Handles navigation intents by dispatching to appropriate functions.
