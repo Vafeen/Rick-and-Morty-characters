@@ -1,6 +1,5 @@
 package ru.vafeen.presentation.ui.screen.main_screen
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,11 +17,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import ru.vafeen.domain.model.CharacterData
+import ru.vafeen.presentation.R
+import ru.vafeen.presentation.ui.common.components.CharacterItem
 
 @Composable
 internal fun CharactersScreen(
@@ -52,10 +54,12 @@ internal fun CharactersScreen(
                 ) {
 
                     items(count = characters.itemCount) {
-                        val entity =
-                            characters[it]
+                        val entity = characters[it]
                         if (entity != null) {
-                            CharacterItem(entity) {
+                            CharacterItem(
+                                entity,
+                                placeholder = painterResource(R.drawable.placeholder)
+                            ) {
                                 viewModel.insert(entity.copy(name = "${entity.name}123"))
                             }
                         } else {
@@ -86,29 +90,6 @@ internal fun CharactersScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun CharacterItem(character: CharacterData, onClick: () -> Unit) {
-    // Реализация отображения одного персонажа
-    Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .clickable(onClick = onClick)
-    ) {
-//        AsyncImage(
-//            model = ImageRequest.Builder(LocalContext.current)
-//                .data(character.imageUrl)
-//                .crossfade(true)
-//                .build(),
-//            contentDescription = character.name,
-//            modifier = Modifier.size(128.dp)
-//        )
-        Text(text = "id=${character.id}")
-        Text(text = character.name, style = MaterialTheme.typography.titleMedium)
-        Text(text = character.species, style = MaterialTheme.typography.bodyMedium)
-        // Другие поля персонажа
     }
 }
 

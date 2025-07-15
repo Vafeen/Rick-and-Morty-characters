@@ -57,4 +57,7 @@ dependencies {
 
     // Hilt (DI)
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    // Основная библиотека Coil для Compose
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
 }
