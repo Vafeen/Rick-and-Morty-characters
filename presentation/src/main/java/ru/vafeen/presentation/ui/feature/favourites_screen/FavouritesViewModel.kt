@@ -48,8 +48,10 @@ internal class FavouritesViewModel @AssistedInject constructor(
             favourites.toPagingFlow()
         }
         .cachedIn(viewModelScope)
+
     private val _state = MutableStateFlow(FavouritesState())
     val state = _state.asStateFlow()
+
     private val _effects = MutableSharedFlow<CharactersEffect>()
 
     /**
@@ -74,6 +76,11 @@ internal class FavouritesViewModel @AssistedInject constructor(
         }
     }
 
+    /**
+     * Updates the current state to reflect whether the favourites list is empty.
+     *
+     * @param isEmpty True if the favourites list is empty, false otherwise.
+     */
     private fun dataIsEmpty(isEmpty: Boolean) {
         _state.update { it.copy(dataIsEmpty = isEmpty) }
     }
