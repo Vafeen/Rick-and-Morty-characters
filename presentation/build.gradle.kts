@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kapt)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.serialization)
 }
 
 android {
@@ -59,10 +60,9 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     // Основная библиотека Coil для Compose
     implementation(libs.coil.compose)
-    implementation("androidx.compose.material:material-icons-extended:1.7.8")
-// Или, если нужны только базовые иконки:
-//    implementation("androidx.compose.material:material-icons-core:1.7.8")
-
-    implementation("androidx.compose.material:material:1.8.3")
-// или новее
+    // Icons
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.material)
+    // Navigation
+    implementation(libs.androidx.navigation.compose)
 }
