@@ -19,10 +19,13 @@ internal sealed interface Screen {
 
     @Serializable
     data object Favourites : Screen
+
+    @Serializable
+    data object Settings : Screen
 }
 
 internal val screenWithBottomBar = listOf(
-    Screen.Characters, Screen.Profile, Screen.BottomBarScreens, Screen.Favourites
+    Screen.Characters, Screen.Profile, Screen.BottomBarScreens, Screen.Favourites, Screen.Settings
 )
 
 internal fun getScreenFromRoute(navBackStackEntry: NavBackStackEntry): Screen? {
@@ -30,6 +33,7 @@ internal fun getScreenFromRoute(navBackStackEntry: NavBackStackEntry): Screen? {
     return when {
         route == Screen.Characters::class.qualifiedName -> Screen.Characters
         route == Screen.BottomBarScreens::class.qualifiedName -> Screen.BottomBarScreens
+        route == Screen.Settings::class.qualifiedName -> Screen.Settings
         route == Screen.Favourites::class.qualifiedName -> Screen.Favourites
         route == Screen.Profile::class.qualifiedName -> Screen.Profile
         route.startsWith("${Screen.Character::class.qualifiedName}") -> navBackStackEntry.toRoute<Screen.Character>()

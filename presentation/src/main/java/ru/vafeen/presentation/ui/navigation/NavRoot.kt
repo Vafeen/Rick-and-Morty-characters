@@ -30,6 +30,7 @@ import ru.vafeen.presentation.ui.feature.character_screen.CharacterScreen
 import ru.vafeen.presentation.ui.feature.character_screen.ProfileScreen
 import ru.vafeen.presentation.ui.feature.characters_screen.CharactersScreen
 import ru.vafeen.presentation.ui.feature.favourites_screen.FavouritesScreen
+import ru.vafeen.presentation.ui.feature.settings_screen.SettingsScreen
 import ru.vafeen.presentation.ui.theme.AppTheme
 import ru.vafeen.presentation.ui.theme.MainTheme
 
@@ -81,13 +82,18 @@ internal fun NavRoot() {
                             screen = Screen.Favourites,
                             icon = painterResource(R.drawable.favorite_full),
                             contentDescription = stringResource(R.string.favourites_screen)
+                        ),
+                        BottomBarItem(
+                            screen = Screen.Settings,
+                            icon = painterResource(R.drawable.settings),
+                            contentDescription = stringResource(R.string.settings_screen)
                         )
                     ).let {
                         if (state.settings.yourCharacterId != null) it.plus(
                             BottomBarItem(
                                 screen = Screen.Profile,
                                 icon = painterResource(R.drawable.profile),
-                                contentDescription = stringResource(R.string.profile)
+                                contentDescription = stringResource(R.string.profile_screen)
                             )
                         ) else it
                     })
@@ -130,6 +136,7 @@ internal fun NavRoot() {
                         composable<Screen.Characters> { CharactersScreen(sendRootIntent = viewModel::handleIntent) }
                         composable<Screen.Favourites> { FavouritesScreen(sendRootIntent = viewModel::handleIntent) }
                         composable<Screen.Profile> { ProfileScreen(sendRootIntent = viewModel::handleIntent) }
+                        composable<Screen.Settings> { SettingsScreen(sendRootIntent = viewModel::handleIntent) }
                     }
                 }
 

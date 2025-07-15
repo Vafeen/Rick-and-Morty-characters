@@ -3,6 +3,8 @@ package ru.vafeen.presentation.ui.common.utils
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.ColorUtils
+import ru.vafeen.domain.model.Settings
+import kotlin.random.Random
 
 /**
  * Getting suitable color
@@ -11,3 +13,13 @@ import androidx.core.graphics.ColorUtils
 fun Color.suitableColor(): Color = if (this.isDark()) Color.White else Color.Black
 
 fun Color.isDark(): Boolean = ColorUtils.calculateLuminance(this.toArgb()) < 0.4
+
+fun Settings.getMainColorForThisTheme(isDark: Boolean): Color? =
+    if (isDark) darkThemeColor else lightThemeColor
+
+internal fun generateRandomColor(): Color = Color(
+    red = Random.nextInt(256),
+    green = Random.nextInt(256),
+    blue = Random.nextInt(256),
+    alpha = 255
+)

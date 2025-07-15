@@ -1,10 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Rick and Morty characters</string>
     <string name="characters">Герои</string>
-    <string name="profile">Профиль</string>
+    <string name="profile_screen">Экран профиля</string>
+    <string name="settings_screen">Экран настроек</string>
+
     <string name="back">Назад</string>
     <string name="is_this_character_in_favourites">Добавлен ли персонаж в избранное </string>
     <string name="favourites_screen">Экран избранного</string>
     <string name="data_is_empty">Данных нет</string>
     <string name="is_this_character_is_your">is this character is your</string>
+    <string name="new_interface_color">Новый цвет интерфейса</string>
+    <string name="interface_color">Цвет интерфейса</string>
+    <string name="cancel">Отмена</string>
+    <string name="apply">Применить</string>
+    <string name="delete_this_theme">Удалить эту тему</string>
+    <string name="contacts">Контакты</string>
+    <string name="report_a_bug">Сообщить об ошибке</string>
+    <string name="code">Исходный код</string>
+    <string name="interface_str">Интерфейс</string>
+    <string name="version">версия</string>
 </resources>

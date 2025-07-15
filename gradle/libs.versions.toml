@@ -22,8 +22,10 @@ paging = "3.3.6"
 retrofit = "3.0.0"
 room = "2.7.2"
 hiltAndroid = "2.56.2"
+alwan = "1.0.1"
 
 [libraries]
+alwan = { module = "com.raedapps:alwan", version.ref = "alwan" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
