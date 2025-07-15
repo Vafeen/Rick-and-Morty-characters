@@ -21,18 +21,31 @@ import ru.vafeen.presentation.common.navigation.Screen
 import ru.vafeen.presentation.ui.feature.filters_bottomsheet.FiltersState
 import ru.vafeen.presentation.ui.navigation.NavRootIntent
 
+/**
+ * ViewModel for the Characters screen handling character list, filters, and navigation.
+ *
+ * @property characterLocalRepository Repository for accessing local character data.
+ * @property sendRootIntent Function for sending navigation intents to the root navigation handler.
+ */
 @HiltViewModel(assistedFactory = CharactersViewModel.Factory::class)
 internal class CharactersViewModel @AssistedInject constructor(
     private val characterLocalRepository: CharacterLocalRepository,
     @Assisted private val sendRootIntent: (NavRootIntent) -> Unit,
 ) : ViewModel() {
 
+    // Current filter state backing flow
     private val _currentFilters = MutableStateFlow(FiltersState())
 
+    /**
+     * Flow of paged character data filtered by current filters.
+     * Combined with caching to optimize performance.
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
-    val charactersFlow = _currentFilters.flatMapLatest {
-        it.toPagingFlow(characterLocalRepository)
-    }.cachedIn(viewModelScope)
+    val charactersFlow = _currentFilters
+        .flatMapLatest { filters ->
+            filters.toPagingFlow(characterLocalRepository)
+        }
+        .cachedIn(viewModelScope)
 
     private val _state = MutableStateFlow(CharactersState())
     val state = _state.asStateFlow()
@@ -40,14 +53,14 @@ internal class CharactersViewModel @AssistedInject constructor(
     private val _effects = MutableSharedFlow<CharactersEffect>()
 
     /**
-     * Shared flow of one-time side effects emitted by this ViewModel.
+     * Shared flow for one-time side effects emitted by this ViewModel.
      */
     val effects = _effects.asSharedFlow()
 
     /**
      * Handles user intents (actions) from the UI.
      *
-     * @param intent The intent to handle.
+     * @param intent The intent to process.
      */
     fun handleIntent(intent: CharactersIntent) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -61,12 +74,17 @@ internal class CharactersViewModel @AssistedInject constructor(
     }
 
     /**
-     * Emits a refresh effect to trigger data refresh in the UI.
+     * Emits a refresh effect to notify UI to refresh character data.
      */
     private suspend fun refresh() {
         _effects.emit(CharactersEffect.Refresh)
     }
 
+    /**
+     * Applies the provided filters to character list and refreshes data.
+     *
+     * @param filtersState The new filters to apply.
+     */
     private suspend fun applyFilters(filtersState: FiltersState) {
         _currentFilters.value = filtersState
         _state.update { it.copy(filtersState = filtersState) }
@@ -74,13 +92,29 @@ internal class CharactersViewModel @AssistedInject constructor(
         refresh()
     }
 
+    /**
+     * Shows or hides the filters bottom sheet.
+     *
+     * @param isVisible True to show filters, false to hide.
+     */
     private fun changeFilterVisibility(isVisible: Boolean) {
         _state.update { it.copy(isFilterBottomSheetVisible = isVisible) }
     }
 
+    /**
+     * Handles character click event by sending navigation intent.
+     *
+     * @param id The ID of the clicked character.
+     */
     private fun clickToCharacter(id: Int) =
         sendRootIntent(NavRootIntent.NavigateToScreen(Screen.Character(id)))
 
+    /**
+     * Converts [FiltersState] into a PagingData flow from the repository.
+     *
+     * @param repo The local repository to fetch paged data from.
+     * @return Flow of paged character data filtered by the filters.
+     */
     private fun FiltersState.toPagingFlow(repo: CharacterLocalRepository) =
         repo.getPaged(
             name = name,
@@ -90,6 +124,9 @@ internal class CharactersViewModel @AssistedInject constructor(
             gender = gender?.toString()
         )
 
+    /**
+     * Assisted factory to create [CharactersViewModel] instances with parameterized constructor.
+     */
     @AssistedFactory
     interface Factory {
         fun create(sendRootIntent: (NavRootIntent) -> Unit): CharactersViewModel

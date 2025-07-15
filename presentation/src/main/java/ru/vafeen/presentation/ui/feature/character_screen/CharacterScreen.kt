@@ -53,7 +53,7 @@ internal fun CharacterScreen(
         PullToRefreshBox(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
+                .padding(top = paddingValues.calculateTopPadding()),
             contentAlignment = Alignment.Center,
             isRefreshing = state.isLoading,
             onRefresh = { viewModel.handleIntent(CharacterIntent.FetchData) }

@@ -1,5 +1,6 @@
 package ru.vafeen.presentation.ui.feature.characters_screen
 
+import FiltersBottomSheet
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,10 +9,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,7 +30,9 @@ import ru.vafeen.presentation.R
 import ru.vafeen.presentation.ui.common.components.CharacterItem
 import ru.vafeen.presentation.ui.common.components.ErrorItem
 import ru.vafeen.presentation.ui.common.components.LoadingItem
+import ru.vafeen.presentation.ui.common.utils.suitableColor
 import ru.vafeen.presentation.ui.navigation.NavRootIntent
+import ru.vafeen.presentation.ui.theme.AppTheme
 
 /**
  * Displays the Characters screen with a list of characters, supporting pull-to-refresh
@@ -40,9 +48,8 @@ internal fun CharactersScreen(sendRootIntent: (NavRootIntent) -> Unit) {
             creationCallback = { it.create(sendRootIntent) }
         )
     val characters = viewModel.charactersFlow.collectAsLazyPagingItems()
-    val pullRefreshState = rememberPullToRefreshState()
+    val state by viewModel.state.collectAsState()
 
-    // Collects side effects from the ViewModel, such as triggering a refresh.
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
@@ -53,64 +60,95 @@ internal fun CharactersScreen(sendRootIntent: (NavRootIntent) -> Unit) {
         }
     }
 
-    PullToRefreshBox(
-        state = pullRefreshState,
-        modifier = Modifier.fillMaxSize(),
-        isRefreshing = characters.loadState.refresh is LoadState.Loading,
-        onRefresh = {
-            viewModel.handleIntent(CharactersIntent.Refresh)
-        }
-    ) {
-        when (characters.loadState.refresh) {
-            is LoadState.Error -> {
-                val error = characters.loadState.refresh as LoadState.Error
-                ErrorItem(
-                    message = error.error.localizedMessage ?: "Unknown error",
-                    modifier = Modifier.align(Alignment.Center),
-                    onClickRetry = { characters.retry() }
+    Scaffold(
+        containerColor = AppTheme.colors.background,
+        floatingActionButtonPosition = FabPosition.Center,
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { viewModel.handleIntent(CharactersIntent.ChangeFilterVisibility(true)) },
+                containerColor = AppTheme.colors.mainColor,
+                contentColor = AppTheme.colors.mainColor.suitableColor()
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.filters),
+                    contentDescription = "Filters"
                 )
             }
+        }
+    ) { innerPadding ->
+        val padding = innerPadding
+        if (state.isFilterBottomSheetVisible) {
+            FiltersBottomSheet(
+                initialFilters = state.filtersState,
+                onFiltersApplied = { filters ->
+                    viewModel.handleIntent(CharactersIntent.ApplyFilters(filters))
+                },
+                onDismissRequest = {
+                    viewModel.handleIntent(CharactersIntent.ChangeFilterVisibility(false))
+                }
+            )
+        }
 
-            else -> {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(count = characters.itemCount) { index ->
-                        val entity = characters[index]
-                        if (entity != null) {
-                            CharacterItem(
-                                character = entity,
-                                placeholder = painterResource(R.drawable.placeholder),
-                                onClick = {
-                                    viewModel.handleIntent(CharactersIntent.ClickToCharacter(entity.id))
-                                }
-                            )
-                        } else {
-                            LoadingItem()
-                        }
-                    }
+        PullToRefreshBox(
+            modifier = Modifier.fillMaxSize(),
+            isRefreshing = characters.loadState.refresh is LoadState.Loading,
+            onRefresh = { viewModel.handleIntent(CharactersIntent.Refresh) }
+        ) {
+            when (characters.loadState.refresh) {
+                is LoadState.Error -> {
+                    val error = characters.loadState.refresh as LoadState.Error
+                    ErrorItem(
+                        message = error.error.localizedMessage ?: "Unknown error",
+                        modifier = Modifier.align(Alignment.Center),
+                        onClickRetry = { characters.retry() }
+                    )
+                }
 
-                    if (characters.loadState.append is LoadState.Error) {
-                        val error = characters.loadState.append as LoadState.Error
-                        item {
-                            ErrorItem(
-                                message = error.error.localizedMessage ?: "Load more error",
-                                modifier = Modifier.fillMaxWidth(),
-                                onClickRetry = { characters.retry() }
-                            )
-                        }
-                    }
-
-                    if (characters.loadState.append is LoadState.Loading) {
-                        item {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                CircularProgressIndicator(
-                                    color = Color.Red,
-                                    modifier = Modifier.padding(16.dp)
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(count = characters.itemCount) { index ->
+                            val entity = characters[index]
+                            if (entity != null) {
+                                CharacterItem(
+                                    character = entity,
+                                    placeholder = painterResource(R.drawable.placeholder),
+                                    onClick = {
+                                        viewModel.handleIntent(
+                                            CharactersIntent.ClickToCharacter(
+                                                entity.id
+                                            )
+                                        )
+                                    }
                                 )
+                            } else {
+                                LoadingItem()
+                            }
+                        }
+
+                        if (characters.loadState.append is LoadState.Error) {
+                            val error = characters.loadState.append as LoadState.Error
+                            item {
+                                ErrorItem(
+                                    message = error.error.localizedMessage ?: "Load more error",
+                                    modifier = Modifier.fillMaxWidth(),
+                                    onClickRetry = { characters.retry() }
+                                )
+                            }
+                        }
+
+                        if (characters.loadState.append is LoadState.Loading) {
+                            item {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        color = Color.Red,
+                                        modifier = Modifier.padding(16.dp)
+                                    )
+                                }
                             }
                         }
                     }
@@ -118,4 +156,5 @@ internal fun CharactersScreen(sendRootIntent: (NavRootIntent) -> Unit) {
             }
         }
     }
+
 }

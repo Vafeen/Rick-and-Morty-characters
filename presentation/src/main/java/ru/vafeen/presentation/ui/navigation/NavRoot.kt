@@ -121,6 +121,7 @@ internal fun NavRoot() {
                     }
                 }
 
+
 //            state.release?.let {
 //                UpdateAvailable(release = it) {
 //                    viewModel.handleIntent(NavRootIntent.Update)

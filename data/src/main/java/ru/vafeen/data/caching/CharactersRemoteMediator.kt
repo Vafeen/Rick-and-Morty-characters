@@ -10,6 +10,8 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.delay
 import ru.vafeen.data.local_database.entity.CharacterEntity
 import ru.vafeen.domain.local_database.repository.CharacterLocalRepository
+import ru.vafeen.domain.model.CharacterData
+import ru.vafeen.domain.model.PaginationInfo
 import ru.vafeen.domain.network.ConnectivityChecker
 import ru.vafeen.domain.network.ResponseResult
 import ru.vafeen.domain.network.repository.CharacterRemoteRepository
@@ -30,6 +32,7 @@ import ru.vafeen.domain.network.repository.CharacterRemoteRepository
 @OptIn(ExperimentalPagingApi::class)
 internal class CharactersRemoteMediator @AssistedInject constructor(
     @Assisted private val localRepository: CharacterLocalRepository,
+    @Assisted private val getFromNetwork: suspend (Int) -> ResponseResult<Pair<PaginationInfo, List<CharacterData>>>,
     private val remoteRepository: CharacterRemoteRepository,
     private val connectivityChecker: ConnectivityChecker,
 ) : RemoteMediator<Int, CharacterEntity>() {
@@ -63,7 +66,7 @@ internal class CharactersRemoteMediator @AssistedInject constructor(
 
             if (isConnected) {
                 delay(2000) // Network delay simulation
-                val result = remoteRepository.getCharacters(page = page)
+                val result = getFromNetwork.invoke(page)
 
                 when (result) {
                     is ResponseResult.Success -> {
@@ -124,6 +127,9 @@ internal class CharactersRemoteMediator @AssistedInject constructor(
          *
          * @param characterLocalRepository Local data source implementation
          */
-        fun create(characterLocalRepository: CharacterLocalRepository): CharactersRemoteMediator
+        fun create(
+            @Assisted localRepository: CharacterLocalRepository,
+            @Assisted getFromNetwork: suspend (Int) -> ResponseResult<Pair<PaginationInfo, List<CharacterData>>>,
+        ): CharactersRemoteMediator
     }
 }

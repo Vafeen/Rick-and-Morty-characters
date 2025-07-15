@@ -35,7 +35,7 @@ import ru.vafeen.presentation.ui.theme.AppTheme
 /**
  * Composable display for the filters modal bottom sheet.
  *
- * Shows filter controls for character name, life status, and gender.
+ * Shows filter controls for character name, life status, gender, type, and species.
  * Allows users to reset or apply filters.
  *
  * @param initialFilters Initial state of the filters shown when the sheet appears.
@@ -82,6 +82,26 @@ fun FiltersBottomSheet(
                 value = state.name ?: "",
                 onValueChange = { viewModel.handleEvent(FiltersIntent.NameChanged(it)) },
                 label = { Text("Name") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Type input field
+            OutlinedTextField(
+                value = state.type ?: "",
+                onValueChange = { viewModel.handleEvent(FiltersIntent.TypeChanged(it)) },
+                label = { Text("Type") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Species input field
+            OutlinedTextField(
+                value = state.species ?: "",
+                onValueChange = { viewModel.handleEvent(FiltersIntent.SpeciesChanged(it)) },
+                label = { Text("Species") },
                 modifier = Modifier.fillMaxWidth()
             )
 

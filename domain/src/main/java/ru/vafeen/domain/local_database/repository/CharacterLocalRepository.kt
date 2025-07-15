@@ -33,7 +33,13 @@ interface CharacterLocalRepository {
      *
      * @return A [Flow] of [PagingData]<[CharacterData]> that can be consumed by Paging's UI components.
      */
-    fun getPaged(): Flow<PagingData<CharacterData>>
+    fun getPaged(
+        name: String? = null,
+        status: String? = null,
+        species: String? = null,
+        type: String? = null,
+        gender: String? = null,
+    ): Flow<PagingData<CharacterData>>
 
     /**
      * Inserts or updates characters in the local database.
