@@ -62,4 +62,12 @@ interface CharacterLocalRepository {
      * @return The total count of [CharacterData] entities, or 0 if the table is empty.
      */
     suspend fun getCharactersCount(): Int
+
+    /**
+     * Retrieves a single character by its unique identifier.
+     *
+     * @param id The unique identifier of the character.
+     * @return The corresponding [CharacterData] if found, or null otherwise.
+     */
+    suspend fun getCharacter(id: Int): CharacterData?
 }

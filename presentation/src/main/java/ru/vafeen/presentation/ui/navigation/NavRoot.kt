@@ -31,6 +31,15 @@ import ru.vafeen.presentation.ui.screen.profile_screen.ProfileScreen
 import ru.vafeen.presentation.ui.theme.AppTheme
 import ru.vafeen.presentation.ui.theme.MainTheme
 
+/**
+ * Root navigation composable that sets up the navigation graph and UI scaffolding.
+ *
+ * This composable manages the navigation controller, listens to navigation state changes,
+ * handles navigation effects from the ViewModel, and displays the bottom navigation bar
+ * when appropriate.
+ *
+ * It uses [MainTheme] for theming and provides animated transitions between screens.
+ */
 @Composable
 internal fun NavRoot() {
     MainTheme {
@@ -40,12 +49,10 @@ internal fun NavRoot() {
 
         LaunchedEffect(null) {
             navController.currentBackStackEntryFlow.collect {
-                val currentScreen = getScreenFromRoute(it)
-                    ?: return@collect
+                val currentScreen = getScreenFromRoute(it) ?: return@collect
                 viewModel.handleIntent(NavRootIntent.UpdateCurrentScreen(currentScreen))
             }
         }
-
 
         LaunchedEffect(null) {
             viewModel.effects.collect { effect ->
@@ -113,12 +120,13 @@ internal fun NavRoot() {
                         composable<Screen.Profile> { ProfileScreen(sendRootIntent = viewModel::handleIntent) }
                     }
                 }
+
 //            state.release?.let {
 //                UpdateAvailable(release = it) {
 //                    viewModel.handleIntent(NavRootIntent.Update)
 //                }
 //            }
-//            // Показывать индикатор загрузки, если обновление в процессе
+//            // Show loading indicator if update is in progress
 //            if (state.isUpdateInProgress) UpdateProgress(percentage = state.percentage)
             }
         }

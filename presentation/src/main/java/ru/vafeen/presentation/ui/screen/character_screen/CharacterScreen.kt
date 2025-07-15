@@ -1,16 +1,81 @@
 package ru.vafeen.presentation.ui.screen.character_screen
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import ru.vafeen.presentation.common.navigation.Screen
+import ru.vafeen.presentation.ui.common.components.CharacterContent
+import ru.vafeen.presentation.ui.common.components.CharacterTopAppBar
+import ru.vafeen.presentation.ui.common.components.ErrorItem
 import ru.vafeen.presentation.ui.navigation.NavRootIntent
+import ru.vafeen.presentation.ui.theme.AppTheme
 
+/**
+ * Composable screen to display details of a character.
+ *
+ * @param character The [Screen.Character] instance containing the character ID.
+ * @param sendRootIntent Function to send navigation intents to root view model.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CharacterScreen(
     character: Screen.Character,
     sendRootIntent: (NavRootIntent) -> Unit
 ) {
-    Text("${character.id}")
+    val viewModel = hiltViewModel<CharacterViewModel, CharacterViewModel.Factory>(
+        creationCallback = { factory -> factory.create(character.id) }
+    )
+    val state by viewModel.state.collectAsState()
+
     BackHandler { sendRootIntent(NavRootIntent.Back) }
+    Scaffold(
+        topBar = {
+            if (!state.isLoading && !state.isError && state.characterData != null) {
+                state.characterData?.let {
+                    CharacterTopAppBar(
+                        characterName = it.name,
+                        onBackClick = { sendRootIntent(NavRootIntent.Back) }
+                    )
+                }
+            }
+        },
+        containerColor = AppTheme.colors.background
+    ) { paddingValues ->
+        PullToRefreshBox(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center,
+            isRefreshing = state.isLoading,
+            onRefresh = { viewModel.handleIntent(CharacterIntent.FetchData) }
+        ) {
+            state.let { state ->
+                if (state.isError) {
+                    ErrorItem(
+                        message = "error",
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        viewModel.handleIntent(CharacterIntent.FetchData)
+                    }
+                }
+                if (!state.isLoading && !state.isError && state.characterData != null) {
+                    CharacterContent(character = state.characterData)
+                }
+            }
+
+        }
+
+    }
+
+
 }
+

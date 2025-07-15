@@ -24,10 +24,10 @@ internal interface CharacterDao : DataAccessObject<CharacterEntity>,
     /**
      * Retrieves a paginated subset of characters using offset/limit strategy.
      *
-     * @param offset The starting position in the dataset (0-based index)
-     * @param limit Maximum number of items to return
+     * @param offset The starting position in the dataset (0-based index).
+     * @param limit Maximum number of items to return.
      * @return List of [CharacterEntity] for the requested page.
-     *         Empty list if no data exists at the specified offset.
+     *         Returns an empty list if no data exists at the specified offset.
      *
      * @sample ru.vafeen.data.repository.CharacterRepositoryImpl.getPagedCharacters
      */
@@ -68,8 +68,17 @@ internal interface CharacterDao : DataAccessObject<CharacterEntity>,
      * Counts total character records in the database.
      *
      * @return Total number of [CharacterEntity] records.
-     *         Returns 0 if table is empty.
+     *         Returns 0 if the table is empty.
      */
     @Query("SELECT COUNT(*) FROM characters")
     suspend fun getCharactersCount(): Int
+
+    /**
+     * Retrieves a single character by its unique [id].
+     *
+     * @param id The unique identifier of the character.
+     * @return The [CharacterEntity] corresponding to the given [id], or null if not found.
+     */
+    @Query("SELECT * FROM characters WHERE id = :id")
+    suspend fun getCharacter(id: Int): CharacterEntity?
 }

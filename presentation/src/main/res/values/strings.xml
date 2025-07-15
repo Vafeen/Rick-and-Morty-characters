@@ -2,4 +2,5 @@
 <resources>
     <string name="characters">Герои</string>
     <string name="profile">Профиль</string>
+    <string name="back">Назад</string>
 </resources>
