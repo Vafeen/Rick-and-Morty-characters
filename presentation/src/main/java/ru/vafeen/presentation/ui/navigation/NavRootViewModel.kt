@@ -15,22 +15,29 @@ import ru.vafeen.presentation.common.navigation.screenWithBottomBar
 import javax.inject.Inject
 
 /**
+ * ViewModel responsible for handling navigation logic and state in the NavRoot.
  *
-
+ * It processes navigation intents, updates UI state, and emits navigation effects
+ * to be observed by the UI layer.
  */
 internal class NavRootViewModel @Inject constructor() : ViewModel() {
 
     private val _effects = MutableSharedFlow<NavRootEffect>()
     val effects = _effects.asSharedFlow()
+
     private val _state = MutableStateFlow(
         NavRootState(
-            startScreen = Screen.BottomBarScreens,//Screen.SignIn(number = "", password = ""),
+            startScreen = Screen.BottomBarScreens, // Screen.SignIn(number = "", password = ""),
             isBottomBarVisible = true,
         )
     )
     val state = _state.asStateFlow()
 
-
+    /**
+     * Handles navigation intents by dispatching to appropriate functions.
+     *
+     * @param intent The navigation intent to handle.
+     */
     fun handleIntent(intent: NavRootIntent) {
         viewModelScope.launch(Dispatchers.IO) {
             when (intent) {
@@ -44,6 +51,11 @@ internal class NavRootViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    /**
+     * Updates the current screen and bottom bar visibility state.
+     *
+     * @param screen The screen to set as current.
+     */
     private fun updateCurrentScreen(screen: Screen) {
         _state.update {
             it.copy(
@@ -53,6 +65,11 @@ internal class NavRootViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    /**
+     * Emits a navigation effect to navigate to the specified screen.
+     *
+     * @param screen The target screen to navigate to.
+     */
     private suspend fun navigateToScreen(screen: Screen) {
         _effects.emit(NavRootEffect.NavigateToScreen { navHostController ->
             navHostController.navigate(screen) {
@@ -61,6 +78,12 @@ internal class NavRootViewModel @Inject constructor() : ViewModel() {
         })
     }
 
+    /**
+     * Emits a navigation effect to navigate to a bottom bar screen,
+     * popping up to the start destination to clear intermediate destinations.
+     *
+     * @param screen The bottom bar screen to navigate to.
+     */
     private suspend fun navigateToBottomBarScreen(screen: Screen) {
         _effects.emit(
             NavRootEffect.NavigateToScreen { navHostController ->
@@ -72,10 +95,17 @@ internal class NavRootViewModel @Inject constructor() : ViewModel() {
         )
     }
 
-
+    /**
+     * Emits a navigation effect to navigate back.
+     */
     private suspend fun back() = _effects.emit(NavRootEffect.Back)
+
+    /**
+     * Updates the visibility state of the bottom navigation bar.
+     *
+     * @param isVisible True to show the bottom bar, false to hide.
+     */
     private fun changeBottomBarVisibleOn(isVisible: Boolean) {
         _state.update { it.copy(isBottomBarVisible = isVisible) }
     }
-
 }

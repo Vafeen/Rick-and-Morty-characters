@@ -15,16 +15,16 @@ import ru.vafeen.presentation.common.bottom_bar.BottomBarItem
 import ru.vafeen.presentation.common.navigation.Screen
 
 /**
- * Компонент нижней навигационной панели (BottomBar) для приложения на Jetpack Compose.
+ * Bottom navigation bar component for a Jetpack Compose application.
  *
- * Отображает навигационную панель с элементами, представленными в списке [screens].
- * Подсвечивает текущий выбранный экран [currentScreen].
- * При нажатии на элемент панели вызывает функцию [navigateTo] для перехода на соответствующий экран.
+ * Displays a navigation bar with items provided in the [screens] list.
+ * Highlights the currently selected screen [currentScreen].
+ * Invokes [navigateTo] callback when a navigation item is clicked to navigate to the corresponding screen.
  *
- * @param containerColor Цвет фона панели навигации.
- * @param currentScreen Текущий активный экран, который подсвечивается на панели.
- * @param screens Список элементов панели навигации, каждый из которых содержит экран, иконку и описание.
- * @param navigateTo Функция обратного вызова для навигации на выбранный экран.
+ * @param containerColor The background color of the navigation bar.
+ * @param currentScreen The currently active screen that is highlighted on the navigation bar.
+ * @param screens A list of navigation bar items, each containing a screen, icon, and description.
+ * @param navigateTo Callback function to navigate to the selected screen.
  */
 @Composable
 internal fun BottomBar(

@@ -1,6 +1,5 @@
 package ru.vafeen.presentation.ui.common.components
 
-
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -19,9 +18,9 @@ import ru.vafeen.presentation.ui.theme.AppTheme
 /**
  * A reusable row component for displaying character details with an icon.
  *
- * @param icon The icon to display
- * @param text The text to display
- * @param modifier Modifier for styling the component
+ * @param icon The icon to display.
+ * @param text The text to display.
+ * @param modifier Modifier for styling the component.
  */
 @Composable
 internal fun CharacterDetailRow(
