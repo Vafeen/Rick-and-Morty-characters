@@ -1,6 +1,7 @@
 package ru.vafeen.presentation.ui.feature.character_screen
 
 import ru.vafeen.domain.model.CharacterData
+import ru.vafeen.domain.model.Settings
 
 /**
  * Represents the UI state for the Character screen.
@@ -10,6 +11,7 @@ import ru.vafeen.domain.model.CharacterData
  * @property isError Indicates if an error occurred while loading character data.
  */
 internal data class CharacterState(
+    val settings: Settings,
     val characterData: CharacterData? = null,
     val isLoading: Boolean = true,
     val isError: Boolean = false,

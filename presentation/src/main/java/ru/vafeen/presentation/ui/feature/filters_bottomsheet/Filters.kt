@@ -12,7 +12,7 @@ import ru.vafeen.domain.model.LifeStatus
  * @property type Filter by character type (nullable).
  * @property gender Filter by character gender (nullable).
  */
-data class FiltersState(
+data class Filters(
     val name: String? = null,
     val status: LifeStatus? = null,
     val species: String? = null,

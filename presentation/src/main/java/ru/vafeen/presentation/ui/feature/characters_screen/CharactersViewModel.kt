@@ -20,7 +20,7 @@ import ru.vafeen.domain.local_database.repository.CharacterLocalRepository
 import ru.vafeen.domain.local_database.repository.FavouritesLocalRepository
 import ru.vafeen.domain.service.SettingsManager
 import ru.vafeen.presentation.common.navigation.Screen
-import ru.vafeen.presentation.ui.feature.filters_bottomsheet.FiltersState
+import ru.vafeen.presentation.ui.feature.filters_bottomsheet.Filters
 import ru.vafeen.presentation.ui.navigation.NavRootIntent
 
 /**
@@ -39,7 +39,7 @@ internal class CharactersViewModel @AssistedInject constructor(
     private val settingsFlow = settingsManager.settingsFlow
 
     // Current filter state backing flow
-    private val _currentFilters = MutableStateFlow(FiltersState())
+    private val _currentFilters = MutableStateFlow(Filters())
 
     /**
      * Flow of paged character data filtered by current filters.
@@ -90,7 +90,7 @@ internal class CharactersViewModel @AssistedInject constructor(
             when (intent) {
                 is CharactersIntent.Refresh -> refresh()
                 is CharactersIntent.ClickToCharacter -> clickToCharacter(intent.id)
-                is CharactersIntent.ApplyFilters -> applyFilters(intent.filtersState)
+                is CharactersIntent.ApplyFilters -> applyFilters(intent.filters)
                 is CharactersIntent.ChangeFilterVisibility -> changeFilterVisibility(intent.isVisible)
                 is CharactersIntent.ChangeIsFavourite -> changeIsFavourite(intent.id)
                 is CharactersIntent.IsDataEmpty -> isDataEmpty(intent.isEmpty)
@@ -125,11 +125,11 @@ internal class CharactersViewModel @AssistedInject constructor(
     /**
      * Applies the provided filters to character list and refreshes data.
      *
-     * @param filtersState The new filters to apply.
+     * @param filters The new filters to apply.
      */
-    private suspend fun applyFilters(filtersState: FiltersState) {
-        _currentFilters.value = filtersState
-        _state.update { it.copy(filtersState = filtersState) }
+    private suspend fun applyFilters(filters: Filters) {
+        _currentFilters.value = filters
+        _state.update { it.copy(filters = filters) }
         changeFilterVisibility(false)
         refresh()
     }
@@ -152,12 +152,12 @@ internal class CharactersViewModel @AssistedInject constructor(
         sendRootIntent(NavRootIntent.NavigateToScreen(Screen.Character(id)))
 
     /**
-     * Converts [FiltersState] into a PagingData flow from the repository.
+     * Converts [Filters] into a PagingData flow from the repository.
      *
      * @param repo The local repository to fetch paged data from.
      * @return Flow of paged character data filtered by the filters.
      */
-    private fun FiltersState.toPagingFlow() =
+    private fun Filters.toPagingFlow() =
         characterLocalRepository.getPaged(
             name = name,
             status = status?.toString(),

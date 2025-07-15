@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.vafeen.domain.service.SettingsManager
 import ru.vafeen.domain.use_case.FetchCharacterDataUseCase
 
 /**
@@ -22,17 +23,25 @@ import ru.vafeen.domain.use_case.FetchCharacterDataUseCase
  */
 @HiltViewModel(assistedFactory = CharacterViewModel.Factory::class)
 internal class CharacterViewModel @AssistedInject constructor(
+    private val settingsManager: SettingsManager,
+    private val fetchCharacterDataUseCase: FetchCharacterDataUseCase,
     @Assisted private val id: Int,
-    private val fetchCharacterDataUseCase: FetchCharacterDataUseCase
 ) : ViewModel() {
-
-    private val _state = MutableStateFlow(CharacterState())
+    val settingsFlow = settingsManager.settingsFlow
+    private val _state = MutableStateFlow(CharacterState(settings = settingsFlow.value))
     val state = _state.asStateFlow()
 
     init {
         // Automatically fetch character data on initialization.
         viewModelScope.launch(Dispatchers.IO) {
             fetchData()
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            settingsFlow.collect { settings ->
+                _state.update {
+                    it.copy(settings = settings)
+                }
+            }
         }
     }
 

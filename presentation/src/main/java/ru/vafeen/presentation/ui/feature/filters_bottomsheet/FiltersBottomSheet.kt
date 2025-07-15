@@ -1,3 +1,4 @@
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -9,12 +10,10 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -22,14 +21,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ru.vafeen.domain.model.Gender
 import ru.vafeen.domain.model.LifeStatus
+import ru.vafeen.presentation.R
+import ru.vafeen.presentation.ui.common.components.ColorPickerDialogButton
+import ru.vafeen.presentation.ui.common.utils.getMainColorForThisTheme
+import ru.vafeen.presentation.ui.feature.filters_bottomsheet.Filters
 import ru.vafeen.presentation.ui.feature.filters_bottomsheet.FiltersEffect
 import ru.vafeen.presentation.ui.feature.filters_bottomsheet.FiltersIntent
-import ru.vafeen.presentation.ui.feature.filters_bottomsheet.FiltersState
 import ru.vafeen.presentation.ui.feature.filters_bottomsheet.FiltersViewModel
 import ru.vafeen.presentation.ui.theme.AppTheme
 
@@ -46,15 +50,19 @@ import ru.vafeen.presentation.ui.theme.AppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FiltersBottomSheet(
-    initialFilters: FiltersState,
-    onFiltersApplied: (FiltersState) -> Unit,
+    initialFilters: Filters,
+    onFiltersApplied: (Filters) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     val viewModel = hiltViewModel<FiltersViewModel, FiltersViewModel.Factory> { factory ->
         factory.create(initialFilters)
     }
     val state by viewModel.state.collectAsState()
-
+    val mainColor by rememberUpdatedState(
+        state.settings.getMainColorForThisTheme(
+            isSystemInDarkTheme()
+        ) ?: AppTheme.colors.mainColor
+    )
     // Handles one-time effects from the ViewModel such as filters applied event.
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
@@ -81,7 +89,7 @@ fun FiltersBottomSheet(
         ) {
             // Name input field
             OutlinedTextField(
-                value = state.name ?: "",
+                value = state.filters.name ?: "",
                 onValueChange = { viewModel.handleEvent(FiltersIntent.NameChanged(it)) },
                 label = { Text("Name") },
                 modifier = Modifier.fillMaxWidth()
@@ -91,7 +99,7 @@ fun FiltersBottomSheet(
 
             // Type input field
             OutlinedTextField(
-                value = state.type ?: "",
+                value = state.filters.type ?: "",
                 onValueChange = { viewModel.handleEvent(FiltersIntent.TypeChanged(it)) },
                 label = { Text("Type") },
                 modifier = Modifier.fillMaxWidth()
@@ -101,7 +109,7 @@ fun FiltersBottomSheet(
 
             // Species input field
             OutlinedTextField(
-                value = state.species ?: "",
+                value = state.filters.species ?: "",
                 onValueChange = { viewModel.handleEvent(FiltersIntent.SpeciesChanged(it)) },
                 label = { Text("Species") },
                 modifier = Modifier.fillMaxWidth()
@@ -117,11 +125,11 @@ fun FiltersBottomSheet(
             ) {
                 LifeStatus.entries.forEach { status ->
                     FilterChip(
-                        selected = state.status == status,
+                        selected = state.filters.status == status,
                         onClick = {
                             viewModel.handleEvent(
                                 FiltersIntent.StatusChanged(
-                                    if (state.status == status) null else status
+                                    if (state.filters.status == status) null else status
                                 )
                             )
                         },
@@ -140,11 +148,11 @@ fun FiltersBottomSheet(
             ) {
                 Gender.entries.forEach { gender ->
                     FilterChip(
-                        selected = state.gender == gender,
+                        selected = state.filters.gender == gender,
                         onClick = {
                             viewModel.handleEvent(
                                 FiltersIntent.GenderChanged(
-                                    if (state.gender == gender) null else gender
+                                    if (state.filters.gender == gender) null else gender
                                 )
                             )
                         },
@@ -160,17 +168,19 @@ fun FiltersBottomSheet(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                OutlinedButton(
-                    onClick = { viewModel.handleEvent(FiltersIntent.ResetFilters) }
+                ColorPickerDialogButton(
+                    onClick = { viewModel.handleEvent(FiltersIntent.ResetFilters) },
+                    color = mainColor
                 ) {
-                    Text("Reset")
+                    Text(stringResource(R.string.reset))
+                }
+                ColorPickerDialogButton(
+                    onClick = { viewModel.handleEvent(FiltersIntent.ApplyFilters) },
+                    color = mainColor
+                ) {
+                    Text(stringResource(R.string.apply_filters))
                 }
 
-                Button(
-                    onClick = { viewModel.handleEvent(FiltersIntent.ApplyFilters) }
-                ) {
-                    Text("Apply Filters")
-                }
             }
         }
     }

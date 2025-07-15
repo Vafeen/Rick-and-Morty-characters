@@ -1,6 +1,7 @@
 package ru.vafeen.presentation.ui.feature.characters_screen
 
 import FiltersBottomSheet
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +34,7 @@ import ru.vafeen.presentation.ui.common.components.CharacterItem
 import ru.vafeen.presentation.ui.common.components.ErrorItem
 import ru.vafeen.presentation.ui.common.components.LoadingItem
 import ru.vafeen.presentation.ui.common.components.ThisThemeText
+import ru.vafeen.presentation.ui.common.utils.getMainColorForThisTheme
 import ru.vafeen.presentation.ui.common.utils.suitableColor
 import ru.vafeen.presentation.ui.navigation.NavRootIntent
 import ru.vafeen.presentation.ui.theme.AppTheme
@@ -51,6 +54,10 @@ internal fun CharactersScreen(sendRootIntent: (NavRootIntent) -> Unit) {
         )
     val characters = viewModel.charactersFlow.collectAsLazyPagingItems()
     val state by viewModel.state.collectAsState()
+    val mainColor by rememberUpdatedState(
+        state.settings.getMainColorForThisTheme(isSystemInDarkTheme())
+            ?: AppTheme.colors.mainColor,
+    )
     LaunchedEffect(characters.itemCount) {
         viewModel.handleIntent(CharactersIntent.IsDataEmpty(characters.itemCount == 0))
     }
@@ -70,8 +77,8 @@ internal fun CharactersScreen(sendRootIntent: (NavRootIntent) -> Unit) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { viewModel.handleIntent(CharactersIntent.ChangeFilterVisibility(true)) },
-                containerColor = AppTheme.colors.mainColor,
-                contentColor = AppTheme.colors.mainColor.suitableColor()
+                containerColor = mainColor,
+                contentColor = mainColor.suitableColor()
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.filters),
@@ -83,7 +90,7 @@ internal fun CharactersScreen(sendRootIntent: (NavRootIntent) -> Unit) {
         val padding = innerPadding
         if (state.isFilterBottomSheetVisible) {
             FiltersBottomSheet(
-                initialFilters = state.filtersState,
+                initialFilters = state.filters,
                 onFiltersApplied = { filters ->
                     viewModel.handleIntent(CharactersIntent.ApplyFilters(filters))
                 },

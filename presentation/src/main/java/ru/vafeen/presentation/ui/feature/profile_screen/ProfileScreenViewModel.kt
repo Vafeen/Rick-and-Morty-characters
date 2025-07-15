@@ -21,14 +21,14 @@ internal class ProfileScreenViewModel @Inject constructor(
     private val fetchCharacterDataUseCase: FetchCharacterDataUseCase
 ) : ViewModel() {
     private val settingsFlow = settingsManager.settingsFlow
-    private val _state = MutableStateFlow(ProfileState())
+    private val _state = MutableStateFlow(ProfileState(settings = settingsFlow.value))
     val state = _state.asStateFlow()
 
     init {
         // Automatically fetch character data on initialization.
         viewModelScope.launch(Dispatchers.IO) {
             val settings = settingsFlow.value
-            _state.update { it.copy(id = settings.yourCharacterId) }
+            _state.update { it.copy(id = settings.yourCharacterId, settings = settings) }
             fetchData()
         }
 
