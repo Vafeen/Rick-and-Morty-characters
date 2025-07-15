@@ -16,8 +16,4 @@ internal data class NavRootState(
     val currentScreen: Screen = startScreen,
     val isBottomBarVisible: Boolean = false,
     val isMyCharacterChosen: Boolean = false
-//    val release: Release? = null,
-//    val settings: Settings,
-//    val isUpdateInProgress: Boolean = false,
-//    val percentage: Float = 0f,
 )

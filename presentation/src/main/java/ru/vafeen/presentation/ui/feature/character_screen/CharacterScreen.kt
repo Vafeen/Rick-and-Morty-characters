@@ -1,6 +1,7 @@
 package ru.vafeen.presentation.ui.feature.character_screen
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -9,6 +10,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -16,6 +18,7 @@ import ru.vafeen.presentation.common.navigation.Screen
 import ru.vafeen.presentation.ui.common.components.CharacterContent
 import ru.vafeen.presentation.ui.common.components.CharacterTopAppBar
 import ru.vafeen.presentation.ui.common.components.ErrorItem
+import ru.vafeen.presentation.ui.common.utils.getMainColorForThisTheme
 import ru.vafeen.presentation.ui.navigation.NavRootIntent
 import ru.vafeen.presentation.ui.theme.AppTheme
 
@@ -35,6 +38,11 @@ internal fun CharacterScreen(
         creationCallback = { factory -> factory.create(character.id) }
     )
     val state by viewModel.state.collectAsState()
+    val mainColor by rememberUpdatedState(
+        state.settings.getMainColorForThisTheme(
+            isSystemInDarkTheme()
+        ) ?: AppTheme.colors.mainColor
+    )
 
     BackHandler { sendRootIntent(NavRootIntent.Back) }
     Scaffold(
@@ -43,7 +51,8 @@ internal fun CharacterScreen(
                 state.characterData?.let {
                     CharacterTopAppBar(
                         characterName = it.name,
-                        onBackClick = { sendRootIntent(NavRootIntent.Back) }
+                        onBackClick = { sendRootIntent(NavRootIntent.Back) },
+                        containerColor = mainColor
                     )
                 }
             }

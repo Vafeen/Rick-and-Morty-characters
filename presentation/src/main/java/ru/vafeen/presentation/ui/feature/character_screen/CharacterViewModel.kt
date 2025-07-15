@@ -12,21 +12,36 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.vafeen.domain.service.SettingsManager
 import ru.vafeen.domain.use_case.FetchCharacterDataUseCase
 
 /**
  * ViewModel for the Character screen that handles loading and exposing character data.
  *
- * @property id The unique character ID to load data for.
+ * @property settingsManager Manager for application settings.
  * @property fetchCharacterDataUseCase Use case to fetch character data.
+ * @property id The unique character ID to load data for.
  */
 @HiltViewModel(assistedFactory = CharacterViewModel.Factory::class)
 internal class CharacterViewModel @AssistedInject constructor(
+    private val settingsManager: SettingsManager,
+    private val fetchCharacterDataUseCase: FetchCharacterDataUseCase,
     @Assisted private val id: Int,
-    private val fetchCharacterDataUseCase: FetchCharacterDataUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(CharacterState())
+    /**
+     * [StateFlow] of application settings, exposed from [settingsManager].
+     */
+    val settingsFlow = settingsManager.settingsFlow
+
+    /**
+     * Backing [MutableStateFlow] holding the current UI state of the screen.
+     */
+    private val _state = MutableStateFlow(CharacterState(settings = settingsFlow.value))
+
+    /**
+     * Read-only [StateFlow] of the current UI state.
+     */
     val state = _state.asStateFlow()
 
     init {
@@ -34,10 +49,18 @@ internal class CharacterViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             fetchData()
         }
+        // Observe changes in settings and update UI state accordingly.
+        viewModelScope.launch(Dispatchers.IO) {
+            settingsFlow.collect { settings ->
+                _state.update {
+                    it.copy(settings = settings)
+                }
+            }
+        }
     }
 
     /**
-     * Handles incoming intents from the UI.
+     * Handles incoming intents (actions) from the UI layer.
      *
      * @param intent The [CharacterIntent] to handle.
      */
@@ -50,7 +73,10 @@ internal class CharacterViewModel @AssistedInject constructor(
     }
 
     /**
-     * Fetches character data via the use case and updates the UI state accordingly.
+     * Fetches character data using the provided use case and updates the UI state.
+     *
+     * Loads the data asynchronously, sets loading and error states accordingly.
+     * Also simulates a loading delay for demonstration.
      */
     private suspend fun fetchData() {
         _state.update { it.copy(isLoading = true, isError = false) }
@@ -70,10 +96,17 @@ internal class CharacterViewModel @AssistedInject constructor(
     }
 
     /**
-     * Assisted factory to create [CharacterViewModel] instances with parameterized constructor.
+     * Assisted factory interface to create instances of [CharacterViewModel]
+     * with a required parameter [id].
      */
     @AssistedFactory
     interface Factory {
+        /**
+         * Creates an instance of [CharacterViewModel] with the specific character ID.
+         *
+         * @param id The unique character ID.
+         * @return The created [CharacterViewModel] instance.
+         */
         fun create(id: Int): CharacterViewModel
     }
 }

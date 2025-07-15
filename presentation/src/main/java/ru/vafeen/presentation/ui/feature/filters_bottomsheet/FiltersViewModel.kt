@@ -15,22 +15,38 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.vafeen.domain.model.Gender
 import ru.vafeen.domain.model.LifeStatus
+import ru.vafeen.domain.service.SettingsManager
 
 /**
  * ViewModel for managing filter UI state and user interactions in the filters bottom sheet.
  *
+ * @property settingsManager Manager to observe app settings.
  * @property initialState The initial filters state when the ViewModel is created.
  */
 @HiltViewModel(assistedFactory = FiltersViewModel.Factory::class)
 class FiltersViewModel @AssistedInject constructor(
-    @Assisted initialState: FiltersState
+    private val settingsManager: SettingsManager,
+    @Assisted initialState: Filters
 ) : ViewModel() {
-
-    private val _state = MutableStateFlow(initialState)
+    private val settingsFlow = settingsManager.settingsFlow
+    private val _state = MutableStateFlow(
+        FilterState(
+            filters = initialState,
+            settings = settingsFlow.value
+        )
+    )
     val state = _state.asStateFlow()
 
     private val _effects = MutableSharedFlow<FiltersEffect>()
     val effects = _effects.asSharedFlow()
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            settingsFlow.collect { settings ->
+                _state.update { it.copy(settings = settings) }
+            }
+        }
+    }
 
     /**
      * Handles incoming intents (user actions) related to filters.
@@ -59,7 +75,7 @@ class FiltersViewModel @AssistedInject constructor(
      * @param name The new name filter value.
      */
     private fun updateName(name: String) {
-        _state.update { it.copy(name = name.ifEmpty { null }) }
+        _state.update { it.copy(filters = it.filters.copy(name = name.ifEmpty { null })) }
     }
 
     /**
@@ -68,7 +84,7 @@ class FiltersViewModel @AssistedInject constructor(
      * @param status The new life status filter value, or null to clear it.
      */
     private fun updateStatus(status: LifeStatus?) {
-        _state.update { it.copy(status = status) }
+        _state.update { it.copy(filters = it.filters.copy(status = status)) }
     }
 
     /**
@@ -79,7 +95,7 @@ class FiltersViewModel @AssistedInject constructor(
      * @param species The new species filter value.
      */
     private fun updateSpecies(species: String) {
-        _state.update { it.copy(species = species.ifEmpty { null }) }
+        _state.update { it.copy(filters = it.filters.copy(species = species.ifEmpty { null })) }
     }
 
     /**
@@ -90,7 +106,7 @@ class FiltersViewModel @AssistedInject constructor(
      * @param type The new type filter value.
      */
     private fun updateType(type: String) {
-        _state.update { it.copy(type = type.ifEmpty { null }) }
+        _state.update { it.copy(filters = it.filters.copy(type = type.ifEmpty { null })) }
     }
 
     /**
@@ -99,7 +115,7 @@ class FiltersViewModel @AssistedInject constructor(
      * @param gender The new gender filter value, or null to clear it.
      */
     private fun updateGender(gender: Gender?) {
-        _state.update { it.copy(gender = gender) }
+        _state.update { it.copy(filters = it.filters.copy(gender = gender)) }
     }
 
     /**
@@ -108,14 +124,14 @@ class FiltersViewModel @AssistedInject constructor(
      * This effect is typically observed by the UI to react accordingly (e.g., dismiss sheet).
      */
     private suspend fun applyFilters() {
-        _effects.emit(FiltersEffect.FiltersApplied(_state.value))
+        _effects.emit(FiltersEffect.FiltersApplied(_state.value.filters))
     }
 
     /**
      * Resets all filter parameters to their default (empty) state and applies the reset filters.
      */
     private suspend fun resetFilters() {
-        _state.update { FiltersState() }
+        _state.update { it.copy(filters = Filters()) }
         applyFilters()
     }
 
@@ -124,6 +140,6 @@ class FiltersViewModel @AssistedInject constructor(
      */
     @AssistedFactory
     interface Factory {
-        fun create(initialState: FiltersState): FiltersViewModel
+        fun create(initialState: Filters): FiltersViewModel
     }
 }

@@ -20,13 +20,14 @@ import javax.inject.Inject
  * Room implementation of [CharacterLocalRepository] with paging support.
  *
  * Handles all local database operations for character data including:
- * - Retrieving all characters
- * - Paginated character loading
- * - Inserting/updating characters
- * - Deleting characters
+ * - Retrieving all characters reactively.
+ * - Paginated character loading.
+ * - Inserting/updating characters.
+ * - Deleting characters.
  *
- * @property characterDao Data Access Object for character operations
+ * @property characterDao Data Access Object for character operations.
  * @property remoteMediatorFactory Factory to create [CharactersRemoteMediator] for remote mediation.
+ * @property characterRemoteRepository Remote repository for fetching character data from network.
  */
 internal class RoomCharacterLocalRepository @Inject constructor(
     private val characterDao: CharacterDao,
@@ -35,7 +36,7 @@ internal class RoomCharacterLocalRepository @Inject constructor(
 ) : CharacterLocalRepository {
 
     /**
-     * Retrieves all characters from local database as a reactive Flow.
+     * Retrieves all characters from local database as a reactive [Flow].
      *
      * @return [Flow] emitting complete list of [CharacterData].
      */
@@ -56,6 +57,11 @@ internal class RoomCharacterLocalRepository @Inject constructor(
     /**
      * Retrieves characters through Jetpack Paging 3 integration with remote mediation support.
      *
+     * @param name Optional filter by character name (substring match).
+     * @param status Optional life status filter.
+     * @param species Optional species filter.
+     * @param type Optional type or subtype filter.
+     * @param gender Optional gender filter.
      * @return [Flow] of [PagingData]<[CharacterData]> for efficient paginated loading.
      */
     @OptIn(ExperimentalPagingApi::class)
@@ -92,6 +98,12 @@ internal class RoomCharacterLocalRepository @Inject constructor(
         },
     ).flow.map { data -> data.map { it.toCharacterData() } }
 
+    /**
+     * Retrieves favourite characters with paging support filtered by their IDs.
+     *
+     * @param favourites List of favourite character IDs.
+     * @return [Flow] of [PagingData]<[CharacterData]> of favourite characters.
+     */
     override fun getFavourites(favourites: List<Int>): Flow<PagingData<CharacterData>> =
         Pager(
             initialKey = 1,
@@ -106,7 +118,7 @@ internal class RoomCharacterLocalRepository @Inject constructor(
 
 
     /**
-     * Inserts or updates characters in local database.
+     * Inserts or updates characters in the local database.
      *
      * @param characters List of [CharacterData] to be inserted or updated.
      */
@@ -114,7 +126,7 @@ internal class RoomCharacterLocalRepository @Inject constructor(
         characterDao.insert(characters.map { it.toEntity() })
 
     /**
-     * Deletes characters from local database.
+     * Deletes characters from the local database.
      *
      * @param characters List of [CharacterData] to be deleted.
      */

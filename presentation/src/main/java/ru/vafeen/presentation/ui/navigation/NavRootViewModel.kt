@@ -17,22 +17,26 @@ import ru.vafeen.presentation.common.navigation.screenWithBottomBar
 import javax.inject.Inject
 
 /**
- * ViewModel responsible for handling navigation logic and state in the NavRoot.
+ * ViewModel responsible for handling navigation logic and state at the root navigation level.
  *
  * It processes navigation intents, updates UI state, and emits navigation effects
  * to be observed by the UI layer.
+ *
+ * @property settingsManager Manager to access application settings.
  */
 @HiltViewModel
 internal class NavRootViewModel @Inject constructor(
     private val settingsManager: SettingsManager
 ) : ViewModel() {
+
     private val settingsFlow = settingsManager.settingsFlow
+
     private val _effects = MutableSharedFlow<NavRootEffect>()
     val effects = _effects.asSharedFlow()
 
     private val _state = MutableStateFlow(
         NavRootState(
-            startScreen = Screen.BottomBarScreens, // Screen.SignIn(number = "", password = ""),
+            startScreen = Screen.BottomBarScreens,
             isBottomBarVisible = true,
             settings = settingsFlow.value
         )
@@ -40,6 +44,7 @@ internal class NavRootViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     init {
+        // Observe settings and update state accordingly
         viewModelScope.launch(Dispatchers.IO) {
             settingsFlow.collect { settings ->
                 _state.update { it.copy(settings = settings) }
@@ -48,6 +53,7 @@ internal class NavRootViewModel @Inject constructor(
     }
 
     init {
+        // Track if user has chosen their character, update state accordingly
         viewModelScope.launch(Dispatchers.IO) {
             settingsManager.settingsFlow.collect { settings ->
                 _state.update { it.copy(isMyCharacterChosen = settings.yourCharacterId != null) }

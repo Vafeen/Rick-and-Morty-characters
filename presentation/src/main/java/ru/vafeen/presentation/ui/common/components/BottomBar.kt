@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import ru.vafeen.presentation.common.bottom_bar.BottomBarItem
 import ru.vafeen.presentation.common.navigation.Screen
+import ru.vafeen.presentation.ui.common.utils.suitableColor
 
 /**
  * Bottom navigation bar component for a Jetpack Compose application.
@@ -49,8 +50,8 @@ internal fun BottomBar(
                 onClick = { navigateTo(item.screen) },
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor = Color.Transparent,
-                    disabledIconColor = Color.Black,
-                    unselectedIconColor = Color.Black.copy(alpha = 0.5f) // todo (custom theme)
+                    disabledIconColor = containerColor.suitableColor(),
+                    unselectedIconColor = containerColor.suitableColor().copy(alpha = 0.5f)
                 ),
                 icon = {
                     Icon(

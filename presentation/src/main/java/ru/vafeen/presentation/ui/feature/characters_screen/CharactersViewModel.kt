@@ -20,13 +20,15 @@ import ru.vafeen.domain.local_database.repository.CharacterLocalRepository
 import ru.vafeen.domain.local_database.repository.FavouritesLocalRepository
 import ru.vafeen.domain.service.SettingsManager
 import ru.vafeen.presentation.common.navigation.Screen
-import ru.vafeen.presentation.ui.feature.filters_bottomsheet.FiltersState
+import ru.vafeen.presentation.ui.feature.filters_bottomsheet.Filters
 import ru.vafeen.presentation.ui.navigation.NavRootIntent
 
 /**
  * ViewModel for the Characters screen handling character list, filters, and navigation.
  *
  * @property characterLocalRepository Repository for accessing local character data.
+ * @property favouritesLocalRepository Repository for accessing and managing favourites locally.
+ * @property settingsManager Manager for app settings state.
  * @property sendRootIntent Function for sending navigation intents to the root navigation handler.
  */
 @HiltViewModel(assistedFactory = CharactersViewModel.Factory::class)
@@ -38,31 +40,19 @@ internal class CharactersViewModel @AssistedInject constructor(
 ) : ViewModel() {
     private val settingsFlow = settingsManager.settingsFlow
 
-    // Current filter state backing flow
-    private val _currentFilters = MutableStateFlow(FiltersState())
+    // Backing flow holding the current filter state
+    private val _currentFilters = MutableStateFlow(Filters())
 
     /**
-     * Flow of paged character data filtered by current filters.
-     * Combined with caching to optimize performance.
+     * Flow of paged character data filtered by current filters and cached in the view model scope.
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     val charactersFlow = _currentFilters
-        .flatMapLatest { filters ->
-            filters.toPagingFlow()
-        }
+        .flatMapLatest { filters -> filters.toPagingFlow() }
         .cachedIn(viewModelScope)
 
     private val _state = MutableStateFlow(CharactersState(settings = settingsFlow.value))
     val state = _state.asStateFlow()
-
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            settingsFlow.collect { settings ->
-                _state.update { it.copy(settings = settings) }
-            }
-        }
-
-    }
 
     private val _effects = MutableSharedFlow<CharactersEffect>()
 
@@ -72,12 +62,18 @@ internal class CharactersViewModel @AssistedInject constructor(
     val effects = _effects.asSharedFlow()
 
     init {
+        // Collect app settings and update UI state accordingly
+        viewModelScope.launch(Dispatchers.IO) {
+            settingsFlow.collect { settings ->
+                _state.update { it.copy(settings = settings) }
+            }
+        }
+        // Collect favourites and update state
         viewModelScope.launch(Dispatchers.IO) {
             favouritesLocalRepository.getAllFavourites().collect { favourites ->
                 _state.update { it.copy(favourites = favourites) }
             }
         }
-
     }
 
     /**
@@ -90,7 +86,7 @@ internal class CharactersViewModel @AssistedInject constructor(
             when (intent) {
                 is CharactersIntent.Refresh -> refresh()
                 is CharactersIntent.ClickToCharacter -> clickToCharacter(intent.id)
-                is CharactersIntent.ApplyFilters -> applyFilters(intent.filtersState)
+                is CharactersIntent.ApplyFilters -> applyFilters(intent.filters)
                 is CharactersIntent.ChangeFilterVisibility -> changeFilterVisibility(intent.isVisible)
                 is CharactersIntent.ChangeIsFavourite -> changeIsFavourite(intent.id)
                 is CharactersIntent.IsDataEmpty -> isDataEmpty(intent.isEmpty)
@@ -125,11 +121,11 @@ internal class CharactersViewModel @AssistedInject constructor(
     /**
      * Applies the provided filters to character list and refreshes data.
      *
-     * @param filtersState The new filters to apply.
+     * @param filters The new filters to apply.
      */
-    private suspend fun applyFilters(filtersState: FiltersState) {
-        _currentFilters.value = filtersState
-        _state.update { it.copy(filtersState = filtersState) }
+    private suspend fun applyFilters(filters: Filters) {
+        _currentFilters.value = filters
+        _state.update { it.copy(filters = filters) }
         changeFilterVisibility(false)
         refresh()
     }
@@ -148,16 +144,17 @@ internal class CharactersViewModel @AssistedInject constructor(
      *
      * @param id The ID of the clicked character.
      */
-    private fun clickToCharacter(id: Int) =
+    private fun clickToCharacter(id: Int) {
         sendRootIntent(NavRootIntent.NavigateToScreen(Screen.Character(id)))
+    }
 
     /**
-     * Converts [FiltersState] into a PagingData flow from the repository.
+     * Converts [Filters] into a PagingData flow from the repository.
      *
-     * @param repo The local repository to fetch paged data from.
+     * @receiver The current [Filters] to apply.
      * @return Flow of paged character data filtered by the filters.
      */
-    private fun FiltersState.toPagingFlow() =
+    private fun Filters.toPagingFlow() =
         characterLocalRepository.getPaged(
             name = name,
             status = status?.toString(),

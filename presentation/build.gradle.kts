@@ -55,14 +55,14 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
-
-    // Hilt (DI)
     implementation(libs.androidx.hilt.navigation.compose)
-    // Основная библиотека Coil для Compose
+    // Coil-Compose
     implementation(libs.coil.compose)
     // Icons
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.material)
     // Navigation
     implementation(libs.androidx.navigation.compose)
+    //alwan (color-picker)
+    implementation(libs.alwan)
 }

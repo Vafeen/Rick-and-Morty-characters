@@ -1,6 +1,5 @@
 package ru.vafeen.presentation.ui.common.components
 
-
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +21,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ru.vafeen.presentation.ui.theme.AppTheme
 
+/**
+ * A reusable card component displaying an icon, a title, and content text.
+ *
+ * Commonly used to show small sections of information with an illustrative icon.
+ *
+ * @param title The title text displayed prominently at the top.
+ * @param icon The [ImageVector] icon shown next to the title.
+ * @param content The content text displayed below the title.
+ * @param modifier Optional [Modifier] for styling.
+ */
 @Composable
 internal fun InfoCard(
     title: String,

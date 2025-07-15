@@ -14,30 +14,37 @@ import ru.vafeen.domain.use_case.FetchCharacterDataUseCase
 import ru.vafeen.presentation.ui.feature.character_screen.CharacterIntent
 import javax.inject.Inject
 
-
+/**
+ * ViewModel for the Profile screen, responsible for loading profile character data
+ * and handling related UI state and events.
+ *
+ * @property settingsManager Manager to access app settings.
+ * @property fetchCharacterDataUseCase Use case to fetch character data by ID.
+ */
 @HiltViewModel
 internal class ProfileScreenViewModel @Inject constructor(
     private val settingsManager: SettingsManager,
     private val fetchCharacterDataUseCase: FetchCharacterDataUseCase
 ) : ViewModel() {
+
     private val settingsFlow = settingsManager.settingsFlow
-    private val _state = MutableStateFlow(ProfileState())
+
+    private val _state = MutableStateFlow(ProfileState(settings = settingsFlow.value))
     val state = _state.asStateFlow()
 
     init {
         // Automatically fetch character data on initialization.
         viewModelScope.launch(Dispatchers.IO) {
             val settings = settingsFlow.value
-            _state.update { it.copy(id = settings.yourCharacterId) }
+            _state.update { it.copy(id = settings.yourCharacterId, settings = settings) }
             fetchData()
         }
-
     }
 
     /**
      * Handles incoming intents from the UI.
      *
-     * @param intent The [ru.vafeen.presentation.ui.feature.character_screen.CharacterIntent] to handle.
+     * @param intent The [CharacterIntent] to handle.
      */
     fun handleIntent(intent: CharacterIntent) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -49,6 +56,8 @@ internal class ProfileScreenViewModel @Inject constructor(
 
     /**
      * Fetches character data via the use case and updates the UI state accordingly.
+     *
+     * If no character ID is set in settings, marks the state as error.
      */
     private suspend fun fetchData() {
         val id = settingsFlow.value.yourCharacterId

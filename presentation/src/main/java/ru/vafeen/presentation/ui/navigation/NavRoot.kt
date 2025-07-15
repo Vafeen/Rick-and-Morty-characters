@@ -3,6 +3,7 @@ package ru.vafeen.presentation.ui.navigation
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -26,10 +27,12 @@ import ru.vafeen.presentation.common.bottom_bar.BottomBarItem
 import ru.vafeen.presentation.common.navigation.Screen
 import ru.vafeen.presentation.common.navigation.getScreenFromRoute
 import ru.vafeen.presentation.ui.common.components.BottomBar
+import ru.vafeen.presentation.ui.common.utils.getMainColorForThisTheme
 import ru.vafeen.presentation.ui.feature.character_screen.CharacterScreen
-import ru.vafeen.presentation.ui.feature.character_screen.ProfileScreen
 import ru.vafeen.presentation.ui.feature.characters_screen.CharactersScreen
 import ru.vafeen.presentation.ui.feature.favourites_screen.FavouritesScreen
+import ru.vafeen.presentation.ui.feature.profile_screen.ProfileScreen
+import ru.vafeen.presentation.ui.feature.settings_screen.SettingsScreen
 import ru.vafeen.presentation.ui.theme.AppTheme
 import ru.vafeen.presentation.ui.theme.MainTheme
 
@@ -48,7 +51,10 @@ internal fun NavRoot() {
         val navController = rememberNavController()
         val viewModel: NavRootViewModel = hiltViewModel()
         val state by viewModel.state.collectAsState()
-
+        val mainColor by rememberUpdatedState(
+            state.settings.getMainColorForThisTheme(isSystemInDarkTheme())
+                ?: AppTheme.colors.mainColor,
+        )
         LaunchedEffect(null) {
             navController.currentBackStackEntryFlow.collect {
                 val currentScreen = getScreenFromRoute(it) ?: return@collect
@@ -81,20 +87,25 @@ internal fun NavRoot() {
                             screen = Screen.Favourites,
                             icon = painterResource(R.drawable.favorite_full),
                             contentDescription = stringResource(R.string.favourites_screen)
+                        ),
+                        BottomBarItem(
+                            screen = Screen.Settings,
+                            icon = painterResource(R.drawable.settings),
+                            contentDescription = stringResource(R.string.settings_screen)
                         )
                     ).let {
                         if (state.settings.yourCharacterId != null) it.plus(
                             BottomBarItem(
                                 screen = Screen.Profile,
                                 icon = painterResource(R.drawable.profile),
-                                contentDescription = stringResource(R.string.profile)
+                                contentDescription = stringResource(R.string.profile_screen)
                             )
                         ) else it
                     })
 
                 if (state.isBottomBarVisible) {
                     BottomBar(
-                        containerColor = AppTheme.colors.mainColor,
+                        containerColor = mainColor,
                         currentScreen = state.currentScreen,
                         screens = bottomBarScreens,
                         navigateTo = { screen ->
@@ -130,17 +141,9 @@ internal fun NavRoot() {
                         composable<Screen.Characters> { CharactersScreen(sendRootIntent = viewModel::handleIntent) }
                         composable<Screen.Favourites> { FavouritesScreen(sendRootIntent = viewModel::handleIntent) }
                         composable<Screen.Profile> { ProfileScreen(sendRootIntent = viewModel::handleIntent) }
+                        composable<Screen.Settings> { SettingsScreen(sendRootIntent = viewModel::handleIntent) }
                     }
                 }
-
-
-//            state.release?.let {
-//                UpdateAvailable(release = it) {
-//                    viewModel.handleIntent(NavRootIntent.Update)
-//                }
-//            }
-//            // Show loading indicator if update is in progress
-//            if (state.isUpdateInProgress) UpdateProgress(percentage = state.percentage)
             }
         }
     }
