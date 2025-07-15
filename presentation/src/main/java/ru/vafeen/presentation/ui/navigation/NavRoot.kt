@@ -1,0 +1,126 @@
+package ru.vafeen.presentation.ui.navigation
+
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import ru.vafeen.presentation.R
+import ru.vafeen.presentation.common.bottom_bar.BottomBarItem
+import ru.vafeen.presentation.common.navigation.Screen
+import ru.vafeen.presentation.common.navigation.getScreenFromRoute
+import ru.vafeen.presentation.ui.common.components.BottomBar
+import ru.vafeen.presentation.ui.screen.character_screen.CharacterScreen
+import ru.vafeen.presentation.ui.screen.characters_screen.CharactersScreen
+import ru.vafeen.presentation.ui.screen.profile_screen.ProfileScreen
+import ru.vafeen.presentation.ui.theme.AppTheme
+import ru.vafeen.presentation.ui.theme.MainTheme
+
+@Composable
+internal fun NavRoot() {
+    MainTheme {
+        val navController = rememberNavController()
+        val viewModel: NavRootViewModel = hiltViewModel()
+        val state by viewModel.state.collectAsState()
+
+        LaunchedEffect(null) {
+            navController.currentBackStackEntryFlow.collect {
+                val currentScreen = getScreenFromRoute(it)
+                    ?: return@collect
+                viewModel.handleIntent(NavRootIntent.UpdateCurrentScreen(currentScreen))
+            }
+        }
+
+
+        LaunchedEffect(null) {
+            viewModel.effects.collect { effect ->
+                when (effect) {
+                    NavRootEffect.Back -> navController.popBackStack()
+                    is NavRootEffect.NavigateToScreen -> effect.navigate(navController)
+                    NavRootEffect.ClearBackStack -> navController.navigateUp()
+                }
+            }
+        }
+
+        Scaffold(
+            containerColor = AppTheme.colors.background,
+            modifier = Modifier.fillMaxSize(),
+            bottomBar = {
+                val bottomBarScreens: List<BottomBarItem> = listOf(
+                    BottomBarItem(
+                        screen = Screen.Characters,
+                        icon = painterResource(R.drawable.characters),
+                        contentDescription = stringResource(R.string.characters)
+                    ),
+                    BottomBarItem(
+                        screen = Screen.Profile,
+                        icon = painterResource(R.drawable.profile),
+                        contentDescription = stringResource(R.string.profile)
+                    ),
+                )
+
+                if (state.isBottomBarVisible) {
+                    BottomBar(
+                        containerColor = AppTheme.colors.mainColor,
+                        currentScreen = state.currentScreen,
+                        screens = bottomBarScreens,
+                        navigateTo = { screen ->
+                            viewModel.handleIntent(NavRootIntent.NavigateToBottomBarScreen(screen))
+                        }
+                    )
+                }
+            }
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+            ) {
+                val tween = tween<Float>(durationMillis = 0)
+                NavHost(
+                    modifier = Modifier.weight(1f),
+                    navController = navController,
+                    startDestination = state.startScreen,
+                    enterTransition = { fadeIn(animationSpec = tween) },
+                    exitTransition = { fadeOut(animationSpec = tween) },
+                    popEnterTransition = { fadeIn(animationSpec = tween) },
+                    popExitTransition = { fadeOut(animationSpec = tween) },
+                ) {
+                    composable<Screen.Character> {
+                        val character = it.toRoute<Screen.Character>()
+                        CharacterScreen(
+                            character = character,
+                            sendRootIntent = viewModel::handleIntent
+                        )
+                    }
+
+                    navigation<Screen.BottomBarScreens>(startDestination = Screen.Characters) {
+                        composable<Screen.Characters> { CharactersScreen(sendRootIntent = viewModel::handleIntent) }
+                        composable<Screen.Profile> { ProfileScreen(sendRootIntent = viewModel::handleIntent) }
+                    }
+                }
+//            state.release?.let {
+//                UpdateAvailable(release = it) {
+//                    viewModel.handleIntent(NavRootIntent.Update)
+//                }
+//            }
+//            // Показывать индикатор загрузки, если обновление в процессе
+//            if (state.isUpdateInProgress) UpdateProgress(percentage = state.percentage)
+            }
+        }
+    }
+}

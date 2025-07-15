@@ -3,23 +3,27 @@ package ru.vafeen.presentation.ui.screen.characters_screen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import ru.vafeen.domain.local_database.repository.CharacterLocalRepository
-import ru.vafeen.domain.model.CharacterData
-import javax.inject.Inject
+import ru.vafeen.presentation.common.navigation.Screen
+import ru.vafeen.presentation.ui.navigation.NavRootIntent
 
 /**
  * ViewModel responsible for managing the Characters screen state.
  *
  * @property characterLocalRepository Repository for accessing character data.
  */
-@HiltViewModel
-internal class CharactersViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = CharactersViewModel.Factory::class)
+internal class CharactersViewModel @AssistedInject constructor(
     private val characterLocalRepository: CharacterLocalRepository,
+    @Assisted private val sendRootIntent: (NavRootIntent) -> Unit,
 ) : ViewModel() {
 
     /**
@@ -43,6 +47,7 @@ internal class CharactersViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             when (intent) {
                 is CharactersIntent.Refresh -> refresh()
+                is CharactersIntent.ClickToCharacter -> clickToCharacter(intent.id)
             }
         }
     }
@@ -54,14 +59,13 @@ internal class CharactersViewModel @Inject constructor(
         _effects.emit(CharactersEffect.Refresh)
     }
 
-    /**
-     * Inserts a new character into the local repository.
-     *
-     * @param characterData The character data to insert.
-     */
-    fun insert(characterData: CharacterData) {
-        viewModelScope.launch(Dispatchers.IO) {
-            characterLocalRepository.insert(listOf(characterData))
-        }
+
+    private fun clickToCharacter(id: Int) =
+        sendRootIntent(NavRootIntent.NavigateToScreen(Screen.Character(id)))
+
+
+    @AssistedFactory
+    interface Factory {
+        fun create(sendRootIntent: (NavRootIntent) -> Unit): CharactersViewModel
     }
 }

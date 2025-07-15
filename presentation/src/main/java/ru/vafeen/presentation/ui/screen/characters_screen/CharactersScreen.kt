@@ -24,6 +24,7 @@ import ru.vafeen.presentation.R
 import ru.vafeen.presentation.ui.common.components.CharacterItem
 import ru.vafeen.presentation.ui.common.components.ErrorItem
 import ru.vafeen.presentation.ui.common.components.LoadingItem
+import ru.vafeen.presentation.ui.navigation.NavRootIntent
 
 /**
  * Displays the Characters screen with a list of characters, supporting pull-to-refresh
@@ -33,8 +34,11 @@ import ru.vafeen.presentation.ui.common.components.LoadingItem
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun CharactersScreen() {
-    val viewModel: CharactersViewModel = hiltViewModel()
+internal fun CharactersScreen(sendRootIntent: (NavRootIntent) -> Unit) {
+    val viewModel: CharactersViewModel =
+        hiltViewModel<CharactersViewModel, CharactersViewModel.Factory>(
+            creationCallback = { it.create(sendRootIntent) }
+        )
     val characters = viewModel.charactersFlow.collectAsLazyPagingItems()
     val pullRefreshState = rememberPullToRefreshState()
 
@@ -66,6 +70,7 @@ internal fun CharactersScreen() {
                     onClickRetry = { characters.retry() }
                 )
             }
+
             else -> {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
@@ -77,7 +82,7 @@ internal fun CharactersScreen() {
                                 character = entity,
                                 placeholder = painterResource(R.drawable.placeholder),
                                 onClick = {
-                                    viewModel.insert(entity.copy(name = "${entity.name}123"))
+                                    viewModel.handleIntent(CharactersIntent.ClickToCharacter(entity.id))
                                 }
                             )
                         } else {
