@@ -32,4 +32,5 @@ internal sealed class CharactersIntent {
      * @param filtersState The state representing currently selected filters.
      */
     data class ApplyFilters(val filtersState: FiltersState) : CharactersIntent()
+    data class ChangeIsFavourite(val id: Int) : CharactersIntent()
 }

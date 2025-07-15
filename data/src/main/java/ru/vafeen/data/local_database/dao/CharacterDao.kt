@@ -42,7 +42,7 @@ internal interface CharacterDao : DataAccessObject<CharacterEntity>,
      */
     @Query(
         """
-    SELECT * FROM characters 
+    SELECT * FROM characters
     WHERE 
         (:name IS NULL OR name LIKE '%' || :name || '%') AND
         (:status IS NULL OR life_status = :status) AND
@@ -56,8 +56,14 @@ internal interface CharacterDao : DataAccessObject<CharacterEntity>,
         status: String?,
         species: String?,
         type: String?,
-        gender: String?
+        gender: String?,
     ): PagingSource<Int, CharacterEntity>
+
+    @Query("SELECT * FROM characters WHERE id IN (:favourites)")
+    fun getFavouritesPagingSource(
+        favourites: List<Int>,
+    ): PagingSource<Int, CharacterEntity>
+
 
     /**
      * Provides reactive stream of all characters with automatic updates.

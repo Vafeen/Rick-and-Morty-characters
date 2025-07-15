@@ -3,4 +3,6 @@
     <string name="characters">Герои</string>
     <string name="profile">Профиль</string>
     <string name="back">Назад</string>
+    <string name="is_this_character_in_favourites">Добавлен ли персонаж в избранное </string>
+    <string name="favourites_screen">Экран избранного</string>
 </resources>

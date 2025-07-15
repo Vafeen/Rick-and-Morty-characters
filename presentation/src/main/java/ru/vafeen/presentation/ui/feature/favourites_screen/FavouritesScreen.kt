@@ -1,6 +1,5 @@
-package ru.vafeen.presentation.ui.feature.characters_screen
+package ru.vafeen.presentation.ui.feature.favourites_screen
 
-import FiltersBottomSheet
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,15 +8,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,26 +24,31 @@ import ru.vafeen.presentation.R
 import ru.vafeen.presentation.ui.common.components.CharacterItem
 import ru.vafeen.presentation.ui.common.components.ErrorItem
 import ru.vafeen.presentation.ui.common.components.LoadingItem
-import ru.vafeen.presentation.ui.common.utils.suitableColor
+import ru.vafeen.presentation.ui.feature.characters_screen.CharactersEffect
 import ru.vafeen.presentation.ui.navigation.NavRootIntent
 import ru.vafeen.presentation.ui.theme.AppTheme
 
 /**
- * Displays the Characters screen with a list of characters, supporting pull-to-refresh
- * and pagination. Handles loading, error, and refresh states.
+ * Displays the Favourites screen showing a list of favourite characters.
  *
- * Uses the [CharactersViewModel] to observe character data and side effects.
+ * Supports paging and pull-to-refresh functionality.
+ *
+ * Handles various UI states like loading, error, and data display.
+ *
+ * Observes [FavouritesViewModel] for state and side effects.
+ *
+ * @param sendRootIntent Function to communicate navigation intents to the root navigator.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun CharactersScreen(sendRootIntent: (NavRootIntent) -> Unit) {
-    val viewModel: CharactersViewModel =
-        hiltViewModel<CharactersViewModel, CharactersViewModel.Factory>(
+internal fun FavouritesScreen(sendRootIntent: (NavRootIntent) -> Unit) {
+    val viewModel: FavouritesViewModel =
+        hiltViewModel<FavouritesViewModel, FavouritesViewModel.Factory>(
             creationCallback = { it.create(sendRootIntent) }
         )
-    val characters = viewModel.charactersFlow.collectAsLazyPagingItems()
-    val state by viewModel.state.collectAsState()
+    val characters = viewModel.favouriteCharactersFlow.collectAsLazyPagingItems()
 
+    // Collects side effects such as refresh requests, triggered externally or internally
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
@@ -62,37 +61,13 @@ internal fun CharactersScreen(sendRootIntent: (NavRootIntent) -> Unit) {
 
     Scaffold(
         containerColor = AppTheme.colors.background,
-        floatingActionButtonPosition = FabPosition.Center,
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { viewModel.handleIntent(CharactersIntent.ChangeFilterVisibility(true)) },
-                containerColor = AppTheme.colors.mainColor,
-                contentColor = AppTheme.colors.mainColor.suitableColor()
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.filters),
-                    contentDescription = "Filters"
-                )
-            }
-        }
     ) { innerPadding ->
-        val padding = innerPadding
-        if (state.isFilterBottomSheetVisible) {
-            FiltersBottomSheet(
-                initialFilters = state.filtersState,
-                onFiltersApplied = { filters ->
-                    viewModel.handleIntent(CharactersIntent.ApplyFilters(filters))
-                },
-                onDismissRequest = {
-                    viewModel.handleIntent(CharactersIntent.ChangeFilterVisibility(false))
-                }
-            )
-        }
+        val x = innerPadding
 
         PullToRefreshBox(
             modifier = Modifier.fillMaxSize(),
             isRefreshing = characters.loadState.refresh is LoadState.Loading,
-            onRefresh = { viewModel.handleIntent(CharactersIntent.Refresh) }
+            onRefresh = { viewModel.handleIntent(FavouritesIntent.Refresh) }
         ) {
             when (characters.loadState.refresh) {
                 is LoadState.Error -> {
@@ -114,17 +89,17 @@ internal fun CharactersScreen(sendRootIntent: (NavRootIntent) -> Unit) {
                                 CharacterItem(
                                     character = entity,
                                     placeholder = painterResource(R.drawable.placeholder),
-                                    isFavourite = entity.id in state.favourites,
+                                    isFavourite = true,
                                     changeIsFavourite = {
                                         viewModel.handleIntent(
-                                            CharactersIntent.ChangeIsFavourite(
+                                            FavouritesIntent.ChangeIsFavourite(
                                                 entity.id
                                             )
                                         )
                                     },
                                     onClick = {
                                         viewModel.handleIntent(
-                                            CharactersIntent.ClickToCharacter(
+                                            FavouritesIntent.ClickToCharacter(
                                                 entity.id
                                             )
                                         )
@@ -164,5 +139,4 @@ internal fun CharactersScreen(sendRootIntent: (NavRootIntent) -> Unit) {
             }
         }
     }
-
 }

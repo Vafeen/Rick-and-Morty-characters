@@ -9,6 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import ru.vafeen.data.local_database.AppDatabase
 import ru.vafeen.data.local_database.dao.CharacterDao
+import ru.vafeen.data.local_database.dao.FavouritesDao
 import javax.inject.Singleton
 
 @Module
@@ -27,4 +28,7 @@ internal class DatabaseServicesModule {
 
     @Provides
     fun provideCharacterDao(appDatabase: AppDatabase): CharacterDao = appDatabase.characterDao()
+
+    @Provides
+    fun provideFavouritesDao(appDatabase: AppDatabase): FavouritesDao = appDatabase.favouritesDao()
 }

@@ -41,6 +41,8 @@ interface CharacterLocalRepository {
         gender: String? = null,
     ): Flow<PagingData<CharacterData>>
 
+    fun getFavourites(favourites: List<Int>): Flow<PagingData<CharacterData>>
+
     /**
      * Inserts or updates characters in the local database.
      * If a character with the same primary key already exists, it will be replaced.

@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.vafeen.domain.local_database.repository.CharacterLocalRepository
+import ru.vafeen.domain.local_database.repository.FavouritesLocalRepository
 import ru.vafeen.presentation.common.navigation.Screen
 import ru.vafeen.presentation.ui.feature.filters_bottomsheet.FiltersState
 import ru.vafeen.presentation.ui.navigation.NavRootIntent
@@ -30,6 +31,7 @@ import ru.vafeen.presentation.ui.navigation.NavRootIntent
 @HiltViewModel(assistedFactory = CharactersViewModel.Factory::class)
 internal class CharactersViewModel @AssistedInject constructor(
     private val characterLocalRepository: CharacterLocalRepository,
+    private val favouritesLocalRepository: FavouritesLocalRepository,
     @Assisted private val sendRootIntent: (NavRootIntent) -> Unit,
 ) : ViewModel() {
 
@@ -43,7 +45,7 @@ internal class CharactersViewModel @AssistedInject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val charactersFlow = _currentFilters
         .flatMapLatest { filters ->
-            filters.toPagingFlow(characterLocalRepository)
+            filters.toPagingFlow()
         }
         .cachedIn(viewModelScope)
 
@@ -57,6 +59,15 @@ internal class CharactersViewModel @AssistedInject constructor(
      */
     val effects = _effects.asSharedFlow()
 
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            favouritesLocalRepository.getAllFavourites().collect { favourites ->
+                _state.update { it.copy(favourites = favourites) }
+            }
+        }
+
+    }
+
     /**
      * Handles user intents (actions) from the UI.
      *
@@ -69,8 +80,15 @@ internal class CharactersViewModel @AssistedInject constructor(
                 is CharactersIntent.ClickToCharacter -> clickToCharacter(intent.id)
                 is CharactersIntent.ApplyFilters -> applyFilters(intent.filtersState)
                 is CharactersIntent.ChangeFilterVisibility -> changeFilterVisibility(intent.isVisible)
+                is CharactersIntent.ChangeIsFavourite -> changeIsFavourite(intent.id)
             }
         }
+    }
+
+    private suspend fun changeIsFavourite(id: Int) {
+        val state = _state.value
+        if (id in state.favourites) favouritesLocalRepository.removeFromFavourites(id)
+        else favouritesLocalRepository.addToFavourites(id)
     }
 
     /**
@@ -115,8 +133,8 @@ internal class CharactersViewModel @AssistedInject constructor(
      * @param repo The local repository to fetch paged data from.
      * @return Flow of paged character data filtered by the filters.
      */
-    private fun FiltersState.toPagingFlow(repo: CharacterLocalRepository) =
-        repo.getPaged(
+    private fun FiltersState.toPagingFlow() =
+        characterLocalRepository.getPaged(
             name = name,
             status = status?.toString(),
             species = species,

@@ -64,7 +64,7 @@ internal class RoomCharacterLocalRepository @Inject constructor(
         status: String?,
         species: String?,
         type: String?,
-        gender: String?
+        gender: String?,
     ): Flow<PagingData<CharacterData>> = Pager(
         initialKey = 1,
         config = PagingConfig(
@@ -77,7 +77,7 @@ internal class RoomCharacterLocalRepository @Inject constructor(
                 status = status,
                 species = species,
                 type = type,
-                gender = gender
+                gender = gender,
             )
         },
         remoteMediator = remoteMediatorFactory.create(this) { page ->
@@ -91,6 +91,19 @@ internal class RoomCharacterLocalRepository @Inject constructor(
             )
         },
     ).flow.map { data -> data.map { it.toCharacterData() } }
+
+    override fun getFavourites(favourites: List<Int>): Flow<PagingData<CharacterData>> =
+        Pager(
+            initialKey = 1,
+            config = PagingConfig(
+                pageSize = PAGE_SIZE,
+                enablePlaceholders = true,
+            ),
+            pagingSourceFactory = {
+                characterDao.getFavouritesPagingSource(favourites)
+            },
+        ).flow.map { data -> data.map { it.toCharacterData() } }
+
 
     /**
      * Inserts or updates characters in local database.
