@@ -10,8 +10,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.vafeen.domain.local_database.repository.CharacterLocalRepository
 import ru.vafeen.domain.local_database.repository.FavouritesLocalRepository
@@ -45,7 +48,8 @@ internal class FavouritesViewModel @AssistedInject constructor(
             favourites.toPagingFlow()
         }
         .cachedIn(viewModelScope)
-
+    private val _state = MutableStateFlow(FavouritesState())
+    val state = _state.asStateFlow()
     private val _effects = MutableSharedFlow<CharactersEffect>()
 
     /**
@@ -65,8 +69,13 @@ internal class FavouritesViewModel @AssistedInject constructor(
                 is FavouritesIntent.Refresh -> refresh()
                 is FavouritesIntent.ClickToCharacter -> clickToCharacter(intent.id)
                 is FavouritesIntent.ChangeIsFavourite -> changeIsFavourite(intent.id)
+                is FavouritesIntent.IsDataEmpty -> dataIsEmpty(intent.isEmpty)
             }
         }
+    }
+
+    private fun dataIsEmpty(isEmpty: Boolean) {
+        _state.update { it.copy(dataIsEmpty = isEmpty) }
     }
 
     /**

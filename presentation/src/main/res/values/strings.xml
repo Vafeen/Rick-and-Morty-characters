@@ -5,4 +5,5 @@
     <string name="back">Назад</string>
     <string name="is_this_character_in_favourites">Добавлен ли персонаж в избранное </string>
     <string name="favourites_screen">Экран избранного</string>
+    <string name="data_is_empty">Данных нет</string>
 </resources>

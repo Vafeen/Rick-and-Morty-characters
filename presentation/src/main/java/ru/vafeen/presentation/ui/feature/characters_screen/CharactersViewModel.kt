@@ -81,8 +81,13 @@ internal class CharactersViewModel @AssistedInject constructor(
                 is CharactersIntent.ApplyFilters -> applyFilters(intent.filtersState)
                 is CharactersIntent.ChangeFilterVisibility -> changeFilterVisibility(intent.isVisible)
                 is CharactersIntent.ChangeIsFavourite -> changeIsFavourite(intent.id)
+                is CharactersIntent.IsDataEmpty -> isDataEmpty(intent.isEmpty)
             }
         }
+    }
+
+    private fun isDataEmpty(isEmpty: Boolean) {
+        _state.update { it.copy(dataIsEmpty = isEmpty) }
     }
 
     private suspend fun changeIsFavourite(id: Int) {

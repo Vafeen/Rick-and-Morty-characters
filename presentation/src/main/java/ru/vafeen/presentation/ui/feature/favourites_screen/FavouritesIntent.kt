@@ -23,4 +23,5 @@ internal sealed class FavouritesIntent {
      * @param id The ID of the character to toggle favourite status.
      */
     data class ChangeIsFavourite(val id: Int) : FavouritesIntent()
+    data class IsDataEmpty(val isEmpty: Boolean) : FavouritesIntent()
 }

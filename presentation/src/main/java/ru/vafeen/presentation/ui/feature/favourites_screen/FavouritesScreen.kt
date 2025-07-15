@@ -12,10 +12,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
@@ -24,6 +27,7 @@ import ru.vafeen.presentation.R
 import ru.vafeen.presentation.ui.common.components.CharacterItem
 import ru.vafeen.presentation.ui.common.components.ErrorItem
 import ru.vafeen.presentation.ui.common.components.LoadingItem
+import ru.vafeen.presentation.ui.common.components.ThisThemeText
 import ru.vafeen.presentation.ui.feature.characters_screen.CharactersEffect
 import ru.vafeen.presentation.ui.navigation.NavRootIntent
 import ru.vafeen.presentation.ui.theme.AppTheme
@@ -47,7 +51,7 @@ internal fun FavouritesScreen(sendRootIntent: (NavRootIntent) -> Unit) {
             creationCallback = { it.create(sendRootIntent) }
         )
     val characters = viewModel.favouriteCharactersFlow.collectAsLazyPagingItems()
-
+    val state by viewModel.state.collectAsState()
     // Collects side effects such as refresh requests, triggered externally or internally
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
@@ -58,7 +62,9 @@ internal fun FavouritesScreen(sendRootIntent: (NavRootIntent) -> Unit) {
             }
         }
     }
-
+    LaunchedEffect(characters.itemCount) {
+        viewModel.handleIntent(FavouritesIntent.IsDataEmpty(characters.itemCount == 0))
+    }
     Scaffold(
         containerColor = AppTheme.colors.background,
     ) { innerPadding ->
@@ -66,9 +72,13 @@ internal fun FavouritesScreen(sendRootIntent: (NavRootIntent) -> Unit) {
 
         PullToRefreshBox(
             modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
             isRefreshing = characters.loadState.refresh is LoadState.Loading,
             onRefresh = { viewModel.handleIntent(FavouritesIntent.Refresh) }
         ) {
+            if (state.dataIsEmpty) {
+                ThisThemeText(stringResource(R.string.data_is_empty))
+            }
             when (characters.loadState.refresh) {
                 is LoadState.Error -> {
                     val error = characters.loadState.refresh as LoadState.Error

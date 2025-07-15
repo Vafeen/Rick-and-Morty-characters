@@ -12,4 +12,5 @@ data class CharactersState(
     val filtersState: FiltersState = FiltersState(),
     val isFilterBottomSheetVisible: Boolean = false,
     val favourites: List<Int> = listOf(),
+    val dataIsEmpty: Boolean = true,
 )
