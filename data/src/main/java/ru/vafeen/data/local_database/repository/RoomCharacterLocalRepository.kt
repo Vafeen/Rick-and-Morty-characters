@@ -24,35 +24,38 @@ import javax.inject.Inject
  * - Inserting/updating characters
  * - Deleting characters
  *
- * @property characterDao Data Access Object for character operationsg
+ * @property characterDao Data Access Object for character operations
+ * @property remoteMediatorFactory Factory to create [CharactersRemoteMediator] for remote mediation.
  */
 internal class RoomCharacterLocalRepository @Inject constructor(
     private val characterDao: CharacterDao,
     private val remoteMediatorFactory: CharactersRemoteMediator.Factory
 ) : CharacterLocalRepository {
 
-
     /**
-     * Retrieves all characters from local database.
-     * @return Flow emitting complete list of [CharacterData]
+     * Retrieves all characters from local database as a reactive Flow.
+     *
+     * @return [Flow] emitting complete list of [CharacterData].
      */
     override fun getAll(): Flow<List<CharacterData>> =
         characterDao.getAll().map { list -> list.map { it.toCharacterData() } }
 
+    /**
+     * Retrieves characters with pagination support using offset and limit.
+     *
+     * @param offset The starting position in the dataset.
+     * @param limit The maximum number of characters to retrieve.
+     * @return List of [CharacterData] for the requested page.
+     */
+    override suspend fun getPagedCharacters(offset: Int, limit: Int): List<CharacterData> =
+        characterDao.getPagedCharacters(offset = offset, limit = limit)
+            .map { it.toCharacterData() }
 
     /**
-     * Retrieves characters with pagination support.
-     * @return Flow of [PagingData]<[CharacterData]> for efficient paginated loading
+     * Retrieves characters through Jetpack Paging 3 integration with remote mediation support.
+     *
+     * @return [Flow] of [PagingData]<[CharacterData]> for efficient paginated loading.
      */
-    override suspend fun getPagedCharacters(
-        offset: Int,
-        limit: Int
-    ): List<CharacterData> = characterDao.getPagedCharacters(
-        offset = offset,
-        limit = limit
-    ).map { it.toCharacterData() }
-
-
     @OptIn(ExperimentalPagingApi::class)
     override fun getPaged(): Flow<PagingData<CharacterData>> = Pager(
         initialKey = 1,
@@ -64,28 +67,46 @@ internal class RoomCharacterLocalRepository @Inject constructor(
         remoteMediator = remoteMediatorFactory.create(this),
     ).flow.map { data -> data.map { it.toCharacterData() } }
 
-
     /**
      * Inserts or updates characters in local database.
-     * @param characters List of [CharacterData] to be inserted/updated
+     *
+     * @param characters List of [CharacterData] to be inserted or updated.
      */
     override suspend fun insert(characters: List<CharacterData>) =
         characterDao.insert(characters.map { it.toEntity() })
 
     /**
      * Deletes characters from local database.
-     * @param characters List of [CharacterData] to be deleted
+     *
+     * @param characters List of [CharacterData] to be deleted.
      */
     override suspend fun delete(characters: List<CharacterData>) =
         characterDao.delete(characters.map { it.toEntity() })
 
+    /**
+     * Clears all characters from the local database.
+     */
     override suspend fun clear() {
         characterDao.clear()
     }
 
+    /**
+     * Returns the total number of character records stored locally.
+     *
+     * @return Total count of characters.
+     */
     override suspend fun getCharactersCount(): Int = characterDao.getCharactersCount()
 
-    companion object {
+    /**
+     * Fetches a single character by its unique identifier.
+     *
+     * @param id The unique identifier of the character.
+     * @return The character data, or null if not found.
+     */
+    override suspend fun getCharacter(id: Int): CharacterData? =
+        characterDao.getCharacter(id)?.toCharacterData()
+
+    private companion object {
         private const val PAGE_SIZE = 20
     }
 }
