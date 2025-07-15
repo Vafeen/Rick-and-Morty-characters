@@ -9,4 +9,5 @@ internal sealed class CharactersIntent {
      * Intent to trigger a refresh action.
      */
     data object Refresh : CharactersIntent()
+    data class ClickToCharacter(val id: Int) : CharactersIntent()
 }
