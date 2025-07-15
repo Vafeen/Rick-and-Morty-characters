@@ -1,5 +1,4 @@
-# Rick And Morty characters 
-# Rick and Morty characters 
+# Rick And Morty characters
 
 Key Features Implemented:
 
