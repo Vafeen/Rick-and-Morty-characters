@@ -1,6 +1,7 @@
 package ru.vafeen.domain.model
 
 import java.time.ZonedDateTime
+
 /**
  * Domain model representing a character in the Rick and Morty universe
  * @property id The id of the character
