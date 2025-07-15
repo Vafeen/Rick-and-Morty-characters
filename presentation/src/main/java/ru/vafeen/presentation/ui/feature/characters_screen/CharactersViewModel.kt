@@ -1,4 +1,4 @@
-package ru.vafeen.presentation.ui.screen.characters_screen
+package ru.vafeen.presentation.ui.feature.characters_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

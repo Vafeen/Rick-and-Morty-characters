@@ -1,4 +1,4 @@
-package ru.vafeen.presentation.ui.screen.character_screen
+package ru.vafeen.presentation.ui.feature.character_screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize

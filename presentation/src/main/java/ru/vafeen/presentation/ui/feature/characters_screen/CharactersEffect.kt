@@ -1,4 +1,4 @@
-package ru.vafeen.presentation.ui.screen.characters_screen
+package ru.vafeen.presentation.ui.feature.characters_screen
 
 /**
  * Represents side effects for the Characters screen.
