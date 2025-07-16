@@ -41,6 +41,3 @@ Room database with Paging 3
 Custom composable components
 
 Dark/light theme support
-
-https://github.com/user-attachments/assets/8903b4f4-6797-41b5-a0b1-347a158a63e6
-
