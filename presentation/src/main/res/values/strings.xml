@@ -21,4 +21,7 @@
     <string name="version">версия</string>
     <string name="reset">Сбросить</string>
     <string name="apply_filters">Применить фильтры</string>
+    <string name="gender">Gender</string>
+    <string name="status">Status</string>
+    <string name="selected_filter">Выбранный фильтр</string>
 </resources>

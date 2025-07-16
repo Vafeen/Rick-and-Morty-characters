@@ -1,3 +1,6 @@
+package ru.vafeen.presentation.ui.feature.filters_bottomsheet
+
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,13 +11,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Chip
+import androidx.compose.material.ChipDefaults
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -23,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -30,11 +37,8 @@ import ru.vafeen.domain.model.Gender
 import ru.vafeen.domain.model.LifeStatus
 import ru.vafeen.presentation.R
 import ru.vafeen.presentation.ui.common.components.AppButton
+import ru.vafeen.presentation.ui.common.components.ThisThemeText
 import ru.vafeen.presentation.ui.common.utils.getMainColorForThisTheme
-import ru.vafeen.presentation.ui.feature.filters_bottomsheet.Filters
-import ru.vafeen.presentation.ui.feature.filters_bottomsheet.FiltersEffect
-import ru.vafeen.presentation.ui.feature.filters_bottomsheet.FiltersIntent
-import ru.vafeen.presentation.ui.feature.filters_bottomsheet.FiltersViewModel
 import ru.vafeen.presentation.ui.theme.AppTheme
 
 /**
@@ -47,7 +51,7 @@ import ru.vafeen.presentation.ui.theme.AppTheme
  * @param onFiltersApplied Callback invoked when filters are applied, providing the selected filters.
  * @param onDismissRequest Callback invoked when the bottom sheet is dismissed.
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun FiltersBottomSheet(
     initialFilters: Filters,
@@ -74,6 +78,17 @@ fun FiltersBottomSheet(
             }
         }
     }
+    val textFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedTextColor = AppTheme.colors.text,
+        unfocusedTextColor = AppTheme.colors.text,
+        focusedBorderColor = AppTheme.colors.text,
+        unfocusedBorderColor = AppTheme.colors.text,
+        focusedPlaceholderColor = AppTheme.colors.text,
+        unfocusedPlaceholderColor = AppTheme.colors.text,
+        focusedLabelColor = AppTheme.colors.text,
+        unfocusedLabelColor = AppTheme.colors.text,
+        cursorColor = AppTheme.colors.text,
+    )
 
     ModalBottomSheet(
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
@@ -85,14 +100,14 @@ fun FiltersBottomSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState())
         ) {
             // Name input field
             OutlinedTextField(
                 value = state.filters.name ?: "",
                 onValueChange = { viewModel.handleEvent(FiltersIntent.NameChanged(it)) },
                 label = { Text("Name") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = textFieldColors
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -102,7 +117,8 @@ fun FiltersBottomSheet(
                 value = state.filters.type ?: "",
                 onValueChange = { viewModel.handleEvent(FiltersIntent.TypeChanged(it)) },
                 label = { Text("Type") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = textFieldColors
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -111,21 +127,24 @@ fun FiltersBottomSheet(
             OutlinedTextField(
                 value = state.filters.species ?: "",
                 onValueChange = { viewModel.handleEvent(FiltersIntent.SpeciesChanged(it)) },
-                label = { Text("Species") },
-                modifier = Modifier.fillMaxWidth()
+                label = { Text(text = "Species") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = textFieldColors
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Life status filter chips
-            Text("Status", style = MaterialTheme.typography.labelMedium)
+            ThisThemeText(
+                stringResource(R.string.status),
+                style = MaterialTheme.typography.labelMedium
+            )
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 LifeStatus.entries.forEach { status ->
-                    FilterChip(
-                        selected = state.filters.status == status,
+                    Chip(
                         onClick = {
                             viewModel.handleEvent(
                                 FiltersIntent.StatusChanged(
@@ -133,22 +152,40 @@ fun FiltersBottomSheet(
                                 )
                             )
                         },
-                        label = { Text(status.toString()) }
-                    )
+                        leadingIcon = if (state.filters.status == status) {
+                            {
+                                Icon(
+                                    painter = painterResource(R.drawable.done),
+                                    contentDescription = stringResource(R.string.selected_filter),
+                                    tint = AppTheme.colors.text
+                                )
+                            }
+                        } else null,
+                        colors = ChipDefaults.chipColors(
+                            contentColor = AppTheme.colors.text,
+                            backgroundColor = AppTheme.colors.buttonColor
+                        ),
+                        border = BorderStroke(1.dp, AppTheme.colors.text),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        ThisThemeText(status.toString())
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Gender filter chips
-            Text("Gender", style = MaterialTheme.typography.labelMedium)
+            ThisThemeText(
+                stringResource(R.string.gender),
+                style = MaterialTheme.typography.labelMedium
+            )
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Gender.entries.forEach { gender ->
-                    FilterChip(
-                        selected = state.filters.gender == gender,
+                    Chip(
                         onClick = {
                             viewModel.handleEvent(
                                 FiltersIntent.GenderChanged(
@@ -156,8 +193,22 @@ fun FiltersBottomSheet(
                                 )
                             )
                         },
-                        label = { Text(gender.toString()) }
-                    )
+                        leadingIcon = if (state.filters.gender == gender) {
+                            {
+                                Icon(
+                                    painter = painterResource(R.drawable.done),
+                                    contentDescription = stringResource(R.string.selected_filter),
+                                    tint = AppTheme.colors.text
+                                )
+                            }
+                        } else null,
+                        colors = ChipDefaults.chipColors(
+                            contentColor = AppTheme.colors.text,
+                            backgroundColor = AppTheme.colors.buttonColor
+                        ),
+                        border = BorderStroke(1.dp, AppTheme.colors.text),
+                        shape = RoundedCornerShape(10.dp)
+                    ) { ThisThemeText(gender.toString()) }
                 }
             }
 

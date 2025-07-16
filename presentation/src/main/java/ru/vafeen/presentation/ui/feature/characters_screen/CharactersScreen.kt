@@ -1,6 +1,5 @@
 package ru.vafeen.presentation.ui.feature.characters_screen
 
-import FiltersBottomSheet
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -36,6 +35,7 @@ import ru.vafeen.presentation.ui.common.components.LoadingItem
 import ru.vafeen.presentation.ui.common.components.ThisThemeText
 import ru.vafeen.presentation.ui.common.utils.getMainColorForThisTheme
 import ru.vafeen.presentation.ui.common.utils.suitableColor
+import ru.vafeen.presentation.ui.feature.filters_bottomsheet.FiltersBottomSheet
 import ru.vafeen.presentation.ui.navigation.NavRootIntent
 import ru.vafeen.presentation.ui.theme.AppTheme
 
