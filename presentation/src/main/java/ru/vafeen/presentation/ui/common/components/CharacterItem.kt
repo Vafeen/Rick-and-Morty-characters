@@ -120,7 +120,8 @@ internal fun CharacterItem(
                         ) {
                             Icon(
                                 painter = painterResource(if (isChosen) R.drawable.chosen_character else R.drawable.character),
-                                contentDescription = stringResource(R.string.is_this_character_is_your)
+                                contentDescription = stringResource(R.string.is_this_character_is_your),
+                                tint = AppTheme.colors.text,
                             )
                         }
                         Spacer(modifier = Modifier.width(10.dp))
@@ -129,7 +130,8 @@ internal fun CharacterItem(
                         ) {
                             Icon(
                                 painter = painterResource(if (isFavourite) R.drawable.favorite_full else R.drawable.favourite),
-                                contentDescription = stringResource(R.string.is_this_character_in_favourites)
+                                contentDescription = stringResource(R.string.is_this_character_in_favourites),
+                                tint = AppTheme.colors.text,
                             )
                         }
 
