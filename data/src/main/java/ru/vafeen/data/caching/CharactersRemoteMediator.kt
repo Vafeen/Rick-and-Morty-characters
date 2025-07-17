@@ -74,9 +74,14 @@ internal class CharactersRemoteMediator @AssistedInject constructor(
                     is ResponseResult.Success -> {
                         val (pagination, characters) = result.data
 
-                        if (loadType == LoadType.REFRESH) {
-                            localRepository.clear()
-                        }
+                        // favourites won't work with it (mediator will save only filtered characters
+                        // and if you add for example alive characters to favourites
+                        // and add filter on dead characters in main screen,
+                        // then you won't see your favourite characters
+                        // in favourites screen
+//                        if (loadType == LoadType.REFRESH) {
+//                            localRepository.clear()
+//                        }
 
                         localRepository.insert(characters)
                         MediatorResult.Success(
