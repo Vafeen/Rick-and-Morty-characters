@@ -5,7 +5,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -90,8 +91,9 @@ internal fun FavouritesScreen(sendRootIntent: (NavRootIntent) -> Unit) {
                 }
 
                 else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize()
+                    LazyVerticalGrid(
+                        modifier = Modifier.fillMaxSize(),
+                        columns = GridCells.Fixed(2)
                     ) {
                         items(count = characters.itemCount) { index ->
                             val entity = characters[index]
