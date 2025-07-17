@@ -1,6 +1,7 @@
 package ru.vafeen.presentation.ui.common.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,8 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Female
 import androidx.compose.material.icons.filled.Male
 import androidx.compose.material.icons.filled.Pets
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Transgender
 import androidx.compose.material3.Card
@@ -84,12 +83,9 @@ internal fun CharacterItem(
                 .clickable(onClick = onClick)
                 .padding(12.dp)
         ) {
-            // Top section with image and basic info
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                // Character avatar
+            // Top section with image and favorite/chosen icons
+            // Character avatar
+            Box(modifier = Modifier.fillMaxWidth()) {
                 AsyncImage(
                     model = remember(character.imageUrl) {
                         ImageRequest.Builder(context)
@@ -101,97 +97,78 @@ internal fun CharacterItem(
                     },
                     contentDescription = character.name,
                     modifier = Modifier
-                        .size(imageSize.dp)
+                        .fillMaxSize()
                         .clip(RoundedCornerShape(cornerRadius)),
                     contentScale = ContentScale.Crop,
                     placeholder = placeholder,
                     error = errorImage,
                 )
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                // Main information column
-                Column(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Row(modifier = Modifier.align(Alignment.End)) {
-                        IconButton(
-                            onClick = changeIsChosen
-                        ) {
-                            Icon(
-                                painter = painterResource(if (isChosen) R.drawable.chosen_character else R.drawable.character),
-                                contentDescription = stringResource(R.string.is_this_character_is_your),
-                                tint = AppTheme.colors.text,
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(10.dp))
-                        IconButton(
-                            onClick = changeIsFavourite
-                        ) {
-                            Icon(
-                                painter = painterResource(if (isFavourite) R.drawable.favorite_full else R.drawable.favourite),
-                                contentDescription = stringResource(R.string.is_this_character_in_favourites),
-                                tint = AppTheme.colors.text,
-                            )
-                        }
-
-                    }
-                    // Species and type
-                    CharacterDetailRow(
-                        icon = Icons.Default.Pets,
-                        text = buildString {
-                            append(character.species)
-                            character.type?.takeIf { it.isNotBlank() }?.let {
-                                append(" ($it)")
-                            }
-                        }
-                    )
-
-                    // Gender information
-                    CharacterDetailRow(
-                        icon = when (character.gender) {
-                            Gender.MALE -> Icons.Default.Male
-                            Gender.FEMALE -> Icons.Default.Female
-                            Gender.GENDERLESS -> Icons.Default.Transgender
-                            else -> Icons.Default.QuestionMark
-                        },
-                        text = character.gender.toString().lowercase()
-                            .replaceFirstChar { it.uppercase() }
-                    )
-
-                    // Life status indicator
-                    LifeStatusIndicator(
-                        status = character.lifeStatus,
-                        modifier = Modifier
-                            .wrapContentWidth()
-                    )
-                }
+                // Life status indicator
+                LifeStatusIndicator(
+                    status = character.lifeStatus,
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .align(Alignment.BottomEnd)
+                )
             }
 
-            // Additional information section
+            // Character details section (below image)
             Column(
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
             ) {
-                // Character name (supports multiline)
+                // Character name
                 ThisThemeText(
                     text = character.name,
                     style = MaterialTheme.typography.titleLarge,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    softWrap = true
+                )
+                // Species and type
+                CharacterDetailRow(
+                    icon = Icons.Default.Pets,
+                    text = character.species,
                 )
 
-                // Origin location
+                // Gender information
                 CharacterDetailRow(
-                    icon = Icons.Default.Public,
-                    text = "From: ${character.origin.name}"
+                    icon = when (character.gender) {
+                        Gender.MALE -> Icons.Default.Male
+                        Gender.FEMALE -> Icons.Default.Female
+                        Gender.GENDERLESS -> Icons.Default.Transgender
+                        else -> Icons.Default.QuestionMark
+                    },
+                    text = character.gender.toString().lowercase()
+                        .replaceFirstChar { it.uppercase() }
                 )
-
-                // Current location
-                CharacterDetailRow(
-                    icon = Icons.Default.Place,
-                    text = "Last seen: ${character.currentLocation.name}"
-                )
+                // Favorite and chosen icons overlay
+                Row(
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    IconButton(
+                        onClick = { changeIsChosen() },
+                        modifier = Modifier
+                            .size(24.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(if (isChosen) R.drawable.chosen_character else R.drawable.character),
+                            contentDescription = stringResource(R.string.is_this_character_is_your),
+                            tint = AppTheme.colors.text,
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    IconButton(
+                        onClick = { changeIsFavourite() },
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(if (isFavourite) R.drawable.favorite_full else R.drawable.favourite),
+                            contentDescription = stringResource(R.string.is_this_character_in_favourites),
+                            tint = AppTheme.colors.text,
+                        )
+                    }
+                }
             }
         }
     }
