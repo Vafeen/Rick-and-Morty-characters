@@ -43,5 +43,7 @@ Custom composable components
 Dark/light theme support
 
 
-https://github.com/user-attachments/assets/0f9d82d4-c843-483f-9e8e-4234a5a91c7e
+https://github.com/user-attachments/assets/79539d57-2f84-4e59-83af-20a56ffa99ed
+
+
 
