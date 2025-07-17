@@ -74,9 +74,9 @@ internal class CharactersRemoteMediator @AssistedInject constructor(
                     is ResponseResult.Success -> {
                         val (pagination, characters) = result.data
 
-                        if (loadType == LoadType.REFRESH) {
-                            localRepository.clear()
-                        }
+//                        if (loadType == LoadType.REFRESH) {
+//                            localRepository.clear()
+//                        }
 
                         localRepository.insert(characters)
                         MediatorResult.Success(
